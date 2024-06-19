@@ -3,31 +3,141 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --background: #1a1a1a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background: #1a1a1a;
+    --grey6: #0f0f0f;
+    --grey8: #141414;
+    --grey10: #1a1a1a;
+    --grey12: #1f1f1f;
+    --grey14: #242424;
+    --grey18: #2e2e2e;
+    --grey20: #333333;
+    --grey30: #4d4d4d;
+    --grey45: #737373;
+    --grey80: #ccc;
+    --grey40: #666;
+    --grey50: #808080;
+    --grey: #a6a6a6;
+    --accentViolet: #8280ff;
+    --lighterViolet: #9b99ff;
+    --accentRed: #af6963;
+    --hoverRed: #aa0707;
+    --accentGreen: #279474;
+    --hoverGreen: #33c399;
+    --accentOrange: #f5ab56;
+    --hoverOrange: #f28f1e;
+    --disabledOrange: #a45c0a;
+    --accentBlue: #277e94;
+    --hoverBlue: #2f98b3;
+
+    --syntaxGreen: #1a8f66;
+    --syntaxPurple: #be65cd;
+    --syntaxBlue: #0075d2;
+    --syntaxOrange: #d78100;
+    --syntaxRed: #e72525;
+    --syntaxText: #333333;
+    --syntaxComment: #7f7f7f;
   }
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
+  background: var(--background);
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  * {
+    font-family: Roboto, sans-serif;
+    box-sizing: border-box;
+  }
+
+  pre {
+    font-family: "Roboto Mono", monospace;
+    font-size: 14px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    color: var(--grey80);
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  p,
+  label {
+    color: var(--grey);
+    font-size: 15px;
+  }
+
+  p {
+    margin-bottom: 4px;
+  }
+
+  a {
+    color: var(--accentViolet);
+
+    &:hover {
+      color: Var(--lighterViolet);
+    }
+  }
+
+  /* code syntax highlighting */
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: var(--syntaxComment);
+  }
+
+  .token.operator {
+    color: var(--syntaxRed);
+  }
+
+  .token.boolean,
+  .token.number {
+    color: var(--syntaxOrange);
+  }
+
+  .token.string,
+  .token.attr-name,
+  .token.entity,
+  .token.url {
+    color: var(--syntaxGreen);
+  }
+
+  .token.string,
+  .token.escaped {
+    color: var(--syntaxOrange);
+  }
+
+  .token.number,
+  .token.string {
+    .valuetype {
+      color: var(--syntaxBlue);
+    }
+  }
+
+  .token.keyword,
+  .token.important,
+  .token.statement {
+    color: var(--syntaxPurple);
+  }
+
+  .token.function,
+  .token.variable,
+  .token.builtin {
+    color: var(--syntaxBlue);
+  }
+
+  .token.faded {
+    opacity: 0.7;
+    font-weight: 700;
   }
 }
