@@ -27,16 +27,6 @@ module default {
     }
   }
 
-  type Revision {
-    required author: Moderator;
-    content: str;
-    revised_at: datetime;
-  }
-
-  abstract type QNASource {
-    url: str;
-  }
-
   abstract type Thread {
     title: str;
     multi messages: Message {
@@ -45,14 +35,7 @@ module default {
 
     draft := .<thread[is QNADraft];
     qna := .<thread[is QNA];
-    first_msg := (select .messages limit 1).displayed_content;
-
-    index fts::index on (
-      fts::with_options(
-        .title,
-        language := fts::Language.eng
-      )
-    );
+    first_msg := (select .messages limit 1).content;
   }
 
   type Tag {
@@ -64,30 +47,14 @@ module default {
   }
 
   type QNA {
-    required slug: str {
-      readonly := true;
-      constraint regexp(r'[a-z0-9_]*');
-      constraint exclusive;
-    }
     required title: str;
     required question: str;
     required answer: str;
-    required multi linkedTags: Tag;
-    tags := .linkedTags.name;
-
-    required thread: Thread {
-      constraint exclusive;
+    multi linkedTags: Tag {
+      on target delete allow;
     }
-  }
-
-  type QNADraft {
-    prompt: str;
-    title: str;
-    question: str;
-    answer: str;
-    multi linkedTags: Tag;
     tags := .linkedTags.name;
-    
+
     required thread: Thread {
       constraint exclusive;
     }
@@ -97,6 +64,32 @@ module default {
         .title,
         language := fts::Language.eng
       ),
+      fts::with_options(
+        .question,
+        language := fts::Language.eng
+      ),
+      fts::with_options(
+      .answer,
+      language := fts::Language.eng
+    )
+  ));
+  }
+
+  type QNADraft {
+    prompt: str;
+    title: str;
+    question: str;
+    answer: str;
+    multi linkedTags: Tag {
+      on target delete allow;
+    }
+    tags := .linkedTags.name;
+    
+    required thread: Thread {
+      constraint exclusive;
+    }
+
+    index fts::index on ((
       fts::with_options(
         .question,
         language := fts::Language.eng
@@ -115,18 +108,7 @@ module default {
       default := datetime_current()
     }
 
-    multi revisions: Revision;
-
-    displayed_content := (
-      select (
-        .content 
-        IF 
-          NOT (EXISTS (.revisions)) 
-        ELSE (
-           (select .revisions order by .revised_at desc limit 1).content
-        )
-      )
-    );
+    attachments: array<str>; 
 
     index fts::index on (
       fts::with_options(

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Header from "./components/Header";
+import Header from "./ui/Header";
+import { getCurrentUser } from "./lib/discord/auth";
+import { auth } from "./lib/edgedb";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
-import { getCurrentUser } from "./api/auth";
-import { auth } from "./edgedb";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,6 +19,7 @@ const links = [
   { href: "/threads", label: "THREADS" },
   { href: "/drafts", label: "DRAFTS" },
   { href: "/qnas", label: "QNAS" },
+  { href: "/tags", label: "TAGS" },
 ];
 
 export default async function RootLayout({
@@ -43,6 +46,7 @@ export default async function RootLayout({
           </div>
         ) : (
           <div>
+            <ToastContainer />
             <Header
               links={links.slice(1)}
               signoutUrl={signoutUrl}

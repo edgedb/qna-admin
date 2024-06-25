@@ -1,12 +1,8 @@
-import OpenAI from "openai";
 import { codeBlock, oneLine } from "common-tags";
-import { getThread } from "../threads";
+import { getThread } from "@/app/lib/db/threads";
+import { getTags } from "@/app/lib/db/tags";
 
 const openAiKey = process.env.OPENAI_KEY;
-
-const openai = new OpenAI({
-  apiKey: openAiKey,
-});
 
 export async function POST(req: Request) {
   try {
@@ -18,11 +14,11 @@ export async function POST(req: Request) {
 
     const { id, uiPrompt } = requestData;
 
-    const messages = (await getThread(id))?.messages.map(
-      (msg) => msg.displayed_content
-    );
+    const messages = (await getThread(id))?.messages.map((msg) => msg.content);
 
     const msgStr = messages?.join("\n\n");
+
+    const tags = (await getTags()).map((tag) => tag.name);
 
     // Moderate the content to comply with OpenAI T&C
     const sanitizedUiPrompt = uiPrompt.trim();
@@ -32,6 +28,10 @@ export async function POST(req: Request) {
 
       Conversation: """
       ${msgStr}
+      """
+
+      Available tags: """
+      ${tags}
       """
       `;
 

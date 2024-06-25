@@ -4,43 +4,51 @@
 
 :root {
   --background: #1a1a1a;
-}
+  --grey: #a6a6a6;
+  --grey6: #0f0f0f;
+  --grey8: #141414;
+  --grey10: #1a1a1a;
+  --grey12: #1f1f1f;
+  --grey14: #242424;
+  --grey18: #2e2e2e;
+  --grey20: #333333;
+  --grey30: #4d4d4d;
+  --grey45: #737373;
+  --grey80: #ccc;
+  --grey40: #666;
+  --grey50: #808080;
+  --accentViolet: #8280ff;
+  --lightViolet: #9b99ff;
+  --accentRed: #af6963;
+  --hoverRed: #c15151;
+  --accentGreen: #279474;
+  --hoverGreen: #33c399;
+  --accentOrange: #f5ab56;
+  --hoverOrange: #f28f1e;
+  --disabledOrange: #a45c0a;
+  --accentBlue: #277e94;
+  --hoverBlue: #2f98b3;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1a1a1a;
-    --grey6: #0f0f0f;
-    --grey8: #141414;
-    --grey10: #1a1a1a;
-    --grey12: #1f1f1f;
-    --grey14: #242424;
-    --grey18: #2e2e2e;
-    --grey20: #333333;
-    --grey30: #4d4d4d;
-    --grey45: #737373;
-    --grey80: #ccc;
-    --grey40: #666;
-    --grey50: #808080;
-    --grey: #a6a6a6;
-    --accentViolet: #8280ff;
-    --lighterViolet: #9b99ff;
-    --accentRed: #af6963;
-    --hoverRed: #aa0707;
-    --accentGreen: #279474;
-    --hoverGreen: #33c399;
-    --accentOrange: #f5ab56;
-    --hoverOrange: #f28f1e;
-    --disabledOrange: #a45c0a;
-    --accentBlue: #277e94;
-    --hoverBlue: #2f98b3;
+  --syntaxGreen: #1a8f66;
+  --syntaxPurple: #be65cd;
+  --syntaxBlue: #0075d2;
+  --syntaxOrange: #d78100;
+  --syntaxRed: #e72525;
+  --syntaxText: #333333;
+  --syntaxComment: #7f7f7f;
 
-    --syntaxGreen: #1a8f66;
-    --syntaxPurple: #be65cd;
-    --syntaxBlue: #0075d2;
-    --syntaxOrange: #d78100;
-    --syntaxRed: #e72525;
-    --syntaxText: #333333;
-    --syntaxComment: #7f7f7f;
+  --toastify-color-info: var(--grey14) !important;
+  --toastify-color-success: var(--accentGreen) !important;
+  --toastify-color-error: var(--accentRed) !important;
+  --toastify-color-warning: var(--accentOrange) !important;
+  --toastify-text-color-light: var(--grey14) !important;
+
+  .Toastify__progress-bar {
+    opacity: 1;
+  }
+
+  .Toastify__close-button--light {
+    opacity: 0.5;
   }
 }
 
@@ -84,8 +92,12 @@ body {
     color: var(--accentViolet);
 
     &:hover {
-      color: Var(--lighterViolet);
+      color: Var(--lightViolet);
     }
+  }
+
+  textarea {
+    color: black;
   }
 
   /* code syntax highlighting */

@@ -6,6 +6,7 @@ export namespace std {
     "id": string;
   }
   export interface $Object extends BaseObject {}
+  export type Endian = "Little" | "Big";
   export interface FreeObject extends BaseObject {}
   export type JsonEmpty = "ReturnEmpty" | "ReturnTarget" | "Error" | "UseNull" | "DeleteKey";
   export namespace enc {
@@ -14,52 +15,43 @@ export namespace std {
 }
 export namespace $default {
   export interface Moderator extends std.$Object {
-    "identity": ext.auth.Identity;
     "account": User;
+    "identity": ext.auth.Identity;
     "email": string;
   }
   export interface Message extends std.$Object {
     "author": User;
-    "revisions": Revision[];
     "content": string;
     "created_at": Date;
-    "displayed_content"?: string | null;
+    "attachments"?: string[] | null;
   }
   export interface QNA extends std.$Object {
     "thread": Thread;
     "answer": string;
     "question": string;
-    "slug": string;
+    "tags": string[];
     "title": string;
     "linkedTags": Tag[];
-    "tags": string[];
   }
   export interface QNADraft extends std.$Object {
-    "linkedTags": Tag[];
     "tags": string[];
     "thread": Thread;
     "answer"?: string | null;
     "prompt"?: string | null;
     "question"?: string | null;
     "title"?: string | null;
-  }
-  export interface QNASource extends std.$Object {
-    "url"?: string | null;
-  }
-  export interface Revision extends std.$Object {
-    "content"?: string | null;
-    "revised_at"?: Date | null;
-    "author": Moderator;
+    "linkedTags": Tag[];
   }
   export interface Tag extends std.$Object {
     "name": string;
     "qnas": QNA[];
   }
   export interface Thread extends std.$Object {
-    "title"?: string | null;
-    "draft"?: QNADraft | null;
     "messages": Message[];
     "qna"?: QNA | null;
+    "draft"?: QNADraft | null;
+    "first_msg"?: string | null;
+    "title"?: string | null;
   }
   export interface User extends std.$Object {
     "name"?: string | null;
@@ -71,8 +63,6 @@ import Moderator = $default.Moderator;
 import Message = $default.Message;
 import QNA = $default.QNA;
 import QNADraft = $default.QNADraft;
-import QNASource = $default.QNASource;
-import Revision = $default.Revision;
 import Tag = $default.Tag;
 import Thread = $default.Thread;
 import User = $default.User;
@@ -82,8 +72,6 @@ export type {
   Message,
   QNA,
   QNADraft,
-  QNASource,
-  Revision,
   Tag,
   Thread,
   User,
@@ -112,6 +100,10 @@ export namespace ext {
     export interface AuthConfig extends cfg.ExtensionConfig {
       "providers": ProviderConfig[];
       "ui"?: UIConfig | null;
+      "app_name"?: string | null;
+      "logo_url"?: string | null;
+      "dark_logo_url"?: string | null;
+      "brand_color"?: string | null;
       "auth_signing_key"?: string | null;
       "token_time_to_live"?: edgedb.Duration | null;
       "allowed_redirect_urls": string[];
@@ -125,6 +117,10 @@ export namespace ext {
       "subject": string;
     }
     export interface ClientTokenIdentity extends Identity {}
+    export interface DiscordOAuthProvider extends OAuthProviderConfig {
+      "name": string;
+      "display_name": string;
+    }
     export interface Factor extends Auditable {
       "identity": LocalIdentity;
     }
@@ -133,6 +129,7 @@ export namespace ext {
       "verified_at"?: Date | null;
     }
     export interface EmailPasswordFactor extends EmailFactor {
+      "email": string;
       "password_hash": string;
     }
     export interface EmailPasswordProviderConfig extends ProviderConfig {
@@ -152,6 +149,13 @@ export namespace ext {
     export interface LocalIdentity extends Identity {
       "subject": string;
     }
+    export interface MagicLinkFactor extends EmailFactor {
+      "email": string;
+    }
+    export interface MagicLinkProviderConfig extends ProviderConfig {
+      "name": string;
+      "token_time_to_live": edgedb.Duration;
+    }
     export interface PKCEChallenge extends Auditable {
       "challenge": string;
       "auth_token"?: string | null;
@@ -170,6 +174,10 @@ export namespace ext {
       "timeout_per_attempt": edgedb.Duration;
     }
     export type SMTPSecurity = "PlainText" | "TLS" | "STARTTLS" | "STARTTLSOrPlainText";
+    export interface SlackOAuthProvider extends OAuthProviderConfig {
+      "name": string;
+      "display_name": string;
+    }
     export interface UIConfig extends cfg.ConfigObject {
       "redirect_to": string;
       "redirect_to_on_signup"?: string | null;
@@ -178,6 +186,25 @@ export namespace ext {
       "logo_url"?: string | null;
       "dark_logo_url"?: string | null;
       "brand_color"?: string | null;
+    }
+    export interface WebAuthnAuthenticationChallenge extends Auditable {
+      "challenge": Uint8Array;
+      "factors": WebAuthnFactor[];
+    }
+    export interface WebAuthnFactor extends EmailFactor {
+      "user_handle": Uint8Array;
+      "credential_id": Uint8Array;
+      "public_key": Uint8Array;
+    }
+    export interface WebAuthnProviderConfig extends ProviderConfig {
+      "name": string;
+      "relying_party_origin": string;
+      "require_verification": boolean;
+    }
+    export interface WebAuthnRegistrationChallenge extends Auditable {
+      "challenge": Uint8Array;
+      "email": string;
+      "user_handle": Uint8Array;
     }
   }
 }
@@ -200,6 +227,9 @@ export namespace cfg {
     "allow_bare_ddl"?: AllowBareDDL | null;
     "apply_access_policies"?: boolean | null;
     "allow_user_specified_id"?: boolean | null;
+    "cors_allow_origins": string[];
+    "auto_rebuild_query_cache"?: boolean | null;
+    "query_cache_mode"?: QueryCacheMode | null;
     "shared_buffers"?: edgedb.ConfigMemory | null;
     "query_work_mem"?: edgedb.ConfigMemory | null;
     "maintenance_work_mem"?: edgedb.ConfigMemory | null;
@@ -219,9 +249,10 @@ export namespace cfg {
   export interface AuthMethod extends ConfigObject {
     "transports": ConnectionTransport[];
   }
-  export interface Config extends AbstractConfig {}
-  export type ConnectionTransport = "TCP" | "TCP_PG" | "HTTP" | "SIMPLE_HTTP";
   export interface DatabaseConfig extends AbstractConfig {}
+  export interface BranchConfig extends DatabaseConfig {}
+  export interface Config extends AbstractConfig {}
+  export type ConnectionTransport = "TCP" | "TCP_PG" | "HTTP" | "SIMPLE_HTTP" | "HTTP_METRICS" | "HTTP_HEALTH";
   export interface ExtensionConfig extends ConfigObject {
     "cfg": AbstractConfig;
   }
@@ -232,10 +263,14 @@ export namespace cfg {
   export interface Password extends AuthMethod {
     "transports": ConnectionTransport[];
   }
+  export type QueryCacheMode = "InMemory" | "RegInline" | "PgFunc" | "Default";
   export interface SCRAM extends AuthMethod {
     "transports": ConnectionTransport[];
   }
   export interface Trust extends AuthMethod {}
+  export interface mTLS extends AuthMethod {
+    "transports": ConnectionTransport[];
+  }
 }
 export namespace discord {
   export interface HelpChannel extends std.$Object {
@@ -251,8 +286,8 @@ export namespace discord {
   }
   export interface Thread extends $default.Thread {
     "review_card"?: ReviewCard | null;
-    "thread_id": string;
     "suggested_by": User[];
+    "thread_id": string;
   }
   export interface User extends $default.User {}
 }
@@ -373,6 +408,7 @@ export namespace schema {
     "readonly"?: boolean | null;
     "default"?: string | null;
     "expr"?: string | null;
+    "secret"?: boolean | null;
     "source"?: Source | null;
     "target"?: Type | null;
     "rewrites": Rewrite[];
@@ -489,6 +525,7 @@ export interface types {
   "std": {
     "BaseObject": std.BaseObject;
     "Object": std.$Object;
+    "Endian": std.Endian;
     "FreeObject": std.FreeObject;
     "JsonEmpty": std.JsonEmpty;
     "enc": {
@@ -500,8 +537,6 @@ export interface types {
     "Message": $default.Message;
     "QNA": $default.QNA;
     "QNADraft": $default.QNADraft;
-    "QNASource": $default.QNASource;
-    "Revision": $default.Revision;
     "Tag": $default.Tag;
     "Thread": $default.Thread;
     "User": $default.User;
@@ -517,6 +552,7 @@ export interface types {
       "AzureOAuthProvider": ext.auth.AzureOAuthProvider;
       "Identity": ext.auth.Identity;
       "ClientTokenIdentity": ext.auth.ClientTokenIdentity;
+      "DiscordOAuthProvider": ext.auth.DiscordOAuthProvider;
       "Factor": ext.auth.Factor;
       "EmailFactor": ext.auth.EmailFactor;
       "EmailPasswordFactor": ext.auth.EmailPasswordFactor;
@@ -526,10 +562,17 @@ export interface types {
       "GoogleOAuthProvider": ext.auth.GoogleOAuthProvider;
       "JWTAlgo": ext.auth.JWTAlgo;
       "LocalIdentity": ext.auth.LocalIdentity;
+      "MagicLinkFactor": ext.auth.MagicLinkFactor;
+      "MagicLinkProviderConfig": ext.auth.MagicLinkProviderConfig;
       "PKCEChallenge": ext.auth.PKCEChallenge;
       "SMTPConfig": ext.auth.SMTPConfig;
       "SMTPSecurity": ext.auth.SMTPSecurity;
+      "SlackOAuthProvider": ext.auth.SlackOAuthProvider;
       "UIConfig": ext.auth.UIConfig;
+      "WebAuthnAuthenticationChallenge": ext.auth.WebAuthnAuthenticationChallenge;
+      "WebAuthnFactor": ext.auth.WebAuthnFactor;
+      "WebAuthnProviderConfig": ext.auth.WebAuthnProviderConfig;
+      "WebAuthnRegistrationChallenge": ext.auth.WebAuthnRegistrationChallenge;
     };
   };
   "__default": {
@@ -541,15 +584,18 @@ export interface types {
     "AllowBareDDL": cfg.AllowBareDDL;
     "Auth": cfg.Auth;
     "AuthMethod": cfg.AuthMethod;
+    "DatabaseConfig": cfg.DatabaseConfig;
+    "BranchConfig": cfg.BranchConfig;
     "Config": cfg.Config;
     "ConnectionTransport": cfg.ConnectionTransport;
-    "DatabaseConfig": cfg.DatabaseConfig;
     "ExtensionConfig": cfg.ExtensionConfig;
     "InstanceConfig": cfg.InstanceConfig;
     "JWT": cfg.JWT;
     "Password": cfg.Password;
+    "QueryCacheMode": cfg.QueryCacheMode;
     "SCRAM": cfg.SCRAM;
     "Trust": cfg.Trust;
+    "mTLS": cfg.mTLS;
   };
   "discord": {
     "HelpChannel": discord.HelpChannel;

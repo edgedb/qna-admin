@@ -3,7 +3,7 @@ import type { Config } from "tailwindcss";
 const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./ui/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
@@ -12,7 +12,10 @@ const config: Config = {
         element: "var(--grey14)",
         hoverElement: "var(--grey18)",
         activeElement: "var(--grey20)",
+        placeholder: "#666",
+        border: "#525252",
         accentViolet: "var(--accentViolet)",
+        hoverViolet: "var(--lightViolet)",
         accentGreen: "var(--accentGreen)",
         hoverGreen: "var(--hoverGreen)",
         accentBlue: "var(--accentBlue)",
