@@ -1,11 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./ui/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./ui/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
       colors: {
@@ -20,7 +16,7 @@ const config: Config = {
         hoverGreen: "var(--hoverGreen)",
         accentBlue: "var(--accentBlue)",
         hoverBlue: "var(--hoverBlue)",
-        accentRed: "var(--accentRed)",
+        accentRed: "rgb(var(--accentRed) / <alpha-value>)",
         hoverRed: "var(--hoverRed)",
         accentOrange: "var(--accentOrange)",
         hoverOrange: "var(--hoverOrange)",
@@ -34,7 +30,7 @@ const config: Config = {
         "search-icon": "url('/search-icon.svg')",
       },
       gridTemplateColumns: {
-        main: "750px 1fr",
+        main: "1fr min(900px, 55vw)",
       },
     },
   },

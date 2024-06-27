@@ -1,5 +1,5 @@
 import { PropsWithChildren, createRef, useEffect } from "react";
-import { cn } from "../utils";
+import { cn } from "./utils";
 
 interface ModalProps {
   open: boolean;
@@ -15,29 +15,6 @@ export default function Modal({
 }: PropsWithChildren<ModalProps>) {
   const modalRootRef = createRef<HTMLDivElement>();
   const modalContentRef = createRef<HTMLDivElement>();
-
-  // useEffect(() => {
-  //   const root = modalRootRef.current;
-  //   const content = modalContentRef.current;
-  //   let lastY = 0;
-
-  //   const handleScroll = () => {
-  //     if (root && content) {
-  //       root.style.transform = `translate(0px, ${window.scrollY}px)`;
-  //       content.style.transform = `translate(0px, ${
-  //         (window.scrollY - lastY) * -16
-  //       }px)`;
-  //     }
-
-  //     lastY = window.scrollY;
-  //   };
-
-  //   window.addEventListener("scroll", handleScroll);
-
-  //   return () => {
-  //     window.removeEventListener("scroll", handleScroll);
-  //   };
-  // }, []);
 
   useEffect(() => {
     const html = document.getElementsByTagName("html")[0];

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { auth } from "../../../lib/edgedb";
-import { discordSignin } from "../../discord/auth";
+import { auth } from "@/app/lib/edgedb";
+import { discordSignin } from "@/app/lib/discord/auth";
 
 const { GET, POST } = auth.createAuthRouteHandlers({
   async onOAuthCallback({ error, tokenData }) {

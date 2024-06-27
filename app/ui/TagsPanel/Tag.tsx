@@ -2,32 +2,28 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-import { CopiedIcon, DeleteIcon, EditIcon } from "../icons";
+import { CopiedIcon, EditIcon } from "../icons";
 import IconButton from "../IconButton";
-import { updateTag, deleteTag } from "@/app/lib/db/tags";
+import { TagT, dbUpdateTag } from "@/app/lib/db/tags";
 import { dbUpdate } from "@/app/lib/utils";
 import Input from "../Input";
+import SwitchButton from "./SwitchButton";
 
-interface TagProps {
-  id: string;
-  name: string;
-}
-
-export default function Tag({ id, name }: TagProps) {
+export default function Tag({ id, name, disabled }: TagT) {
   const router = useRouter();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedTag, setEditedTag] = useState(name);
+  const [isDisabled, setIsDisabled] = useState(disabled);
 
-  async function onUpdate() {
+  async function updateTagName() {
     setIsEditing(false);
 
     if (editedTag && editedTag !== name) {
       try {
         await dbUpdate(
           (async () => {
-            await updateTag(id, editedTag);
+            await dbUpdateTag(id, { name: editedTag });
             router.refresh();
           })(),
           {
@@ -42,19 +38,20 @@ export default function Tag({ id, name }: TagProps) {
     }
   }
 
-  async function onDelete() {
+  async function toggleTag() {
     try {
       await dbUpdate(
         (async () => {
-          await deleteTag(id);
-          router.refresh();
+          await dbUpdateTag(id, { disabled: !isDisabled });
+          setIsDisabled(!isDisabled);
         })(),
         {
-          pending: "Deleting tag...",
-          success: "Tag deleted!",
-          error: "Failed to delete tag.",
+          pending: "Tag is updating...",
+          success: "Tag is updated!",
+          error: "Failed to update tag.",
         }
       );
+      router.refresh();
     } catch (err) {
       console.error(err);
     }
@@ -71,10 +68,10 @@ export default function Tag({ id, name }: TagProps) {
       ) : (
         <span>{name}</span>
       )}
-      <div className="flex gap-0.5">
+      <div className="flex gap-0.5 items-center">
         {isEditing ? (
           <IconButton
-            onClick={onUpdate}
+            onClick={updateTagName}
             icon={<CopiedIcon className="mt-[3px]" />}
             className="text-accentGreen hover:text-hoverGreen"
           />
@@ -85,11 +82,7 @@ export default function Tag({ id, name }: TagProps) {
             className="text-accentOrange hover:text-hoverOrange"
           />
         )}
-        <IconButton
-          onClick={onDelete}
-          icon={<DeleteIcon />}
-          className="text-accentRed hover:text-hoverRed"
-        />
+        <SwitchButton disabled={isDisabled || false} onChange={toggleTag} />
       </div>
     </div>
   );

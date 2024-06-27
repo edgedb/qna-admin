@@ -1,5 +1,24 @@
 import { ToastPromiseParams, toast } from "react-toastify";
 
+export const defaultPrompt = `Summarize the following conversation into a FAQ with 
+question, answer, title and tags. Choose tags only from the provided list of 
+tags. If no tags make sense return empty array for tags. Include markdown when 
+sending code snippets. Make sure to capture the answer within the following 
+messages and include that in the summarized version.
+
+Use the following format to summarize:
+**Title**
+...
+
+**Tags**
+...
+
+**Question**
+...
+
+**Answer**
+...`;
+
 export interface QNASummary {
   title: string;
   question: string;
@@ -14,11 +33,12 @@ export const formatQNASummary = (parsed: QNASummary): string => {
 };
 
 const gptParseRegex =
-  /\*\*Title\*\*:((?:.|[ \r\n\t\f ])+?)\*\*Tags\*\*:((?:.|[ \r\n\t\f ])+?)\*\*Question\*\*:((?:.|[ \r\n\t\f ])+?)\*\*Answer\*\*:(?:.|[ \r\n\t\f ])((?:.|[ \r\n\t\f ])+)/gm;
+  /\*\*Title\*\*\s*:?\s*([\s\S]+?)\s*\*\*Tags\*\*\s*:?\s*([\s\S]+?)\s*\*\*Question\*\*\s*:?\s*([\s\S]+?)\s*\*\*Answer\*\*\s*:?\s*([\s\S]+)/gm;
 
 export const parseQNASummary = (response: string): QNASummary | undefined => {
   const match = gptParseRegex.exec(response);
-
+  console.log("response", response);
+  console.log("match", response);
   if (!match) {
     return;
   }

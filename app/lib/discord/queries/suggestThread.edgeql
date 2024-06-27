@@ -35,13 +35,11 @@ with
   suggested_by := (select users filter .user_id = <str>$suggestorId),
   thread := (insert discord::Thread {
     thread_id := <str>$threadId,
-    title := <str>$threadName,
     messages := messages,
     suggested_by := suggested_by
   } unless conflict on .thread_id else (select discord::Thread))
 select thread {
   id,
-  title,
   thread_id, 
   messages: {
     content,

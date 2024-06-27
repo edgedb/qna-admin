@@ -1,23 +1,4 @@
-// export default function MultiSelect({ options, defaultValue }: any) {
-//   return (
-//     <Select
-//       closeMenuOnSelect={false}
-//       defaultValue={defaultValue}
-//       isMulti
-//       options={options}
-//       styles={{
-//         control: (baseStyles, state) => ({
-//           ...baseStyles,
-//           background: "#333",
-//           outline: "none",
-//           border: "none",
-//         }),
-//       }}
-//     />
-//   );
-// }
-
-import { useState, useRef, useEffect, Dispatch, SetStateAction } from "react";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/app/utils";
 
 interface MultiSelectProps {
@@ -32,7 +13,7 @@ const MultiSelect = ({
   updateSelected,
 }: MultiSelectProps) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -48,8 +29,11 @@ const MultiSelect = ({
     updateSelected(selected.filter((o) => o !== option));
   };
 
-  const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
       setDropdownOpen(false);
     }
   };
@@ -74,7 +58,13 @@ const MultiSelect = ({
         onClick={toggleDropdown}
       >
         {selected.map((option) => (
-          <div className="bg-hoverElement rounded-sm px-1.5" key={option}>
+          <div
+            className={cn(
+              "rounded-sm px-1.5",
+              options.includes(option) ? "bg-hoverElement" : "bg-accentRed/20"
+            )}
+            key={option}
+          >
             {option}
             <span
               className="ml-1 text-accentRed cursor-pointer hover:text-hoverRed"

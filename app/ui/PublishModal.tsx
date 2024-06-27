@@ -1,8 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-
 import ConfirmationModal from "./ConfirmationModal";
-import { QNASummary, formatQNASummary } from "./utils";
+import { QNASummary, formatQNASummary } from "@/app/lib/utils";
 import { Code } from "./Code";
 
 interface PublishModalProps {
@@ -23,9 +22,9 @@ export default function PublishModal({
       onCancel={onCancel}
       open={open}
       onConfirm={() => onPublish(parsed)}
-      className="mx-4 transition-transform"
+      className="transition-transform"
     >
-      <div>
+      <div className="">
         <h4 className="border-b border-title pb-1">
           Does everything look good?
         </h4>

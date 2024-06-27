@@ -43,7 +43,6 @@ const downloadThreadMessages = async (
       }
     }
 
-    console.log("DIDI messages", messages);
     return messages.reverse();
   } finally {
     downloadingInProgress.delete(thread.id);

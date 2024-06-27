@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { generatePagination } from "@/app/lib/utils";
 import { ArrowRightIcon, ArrowLeftIcon } from "@/app/ui/icons";
-import { cn } from "@/app/utils";
+import { cn } from "./utils";
 
 export default function Pagination({ totalPages }: { totalPages: number }) {
   const pathname = usePathname();
@@ -19,7 +19,7 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
 
   const allPages = generatePagination(currentPage, totalPages);
 
-  return (
+  return totalPages > 1 ? (
     <div className="inline-flex">
       <PaginationArrow
         direction="left"
@@ -54,7 +54,7 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
         isDisabled={currentPage >= totalPages}
       />
     </div>
-  );
+  ) : null;
 }
 
 function PaginationNumber({

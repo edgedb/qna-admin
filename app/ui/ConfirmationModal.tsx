@@ -17,7 +17,7 @@ export default function ConfirmationModal({
 }: PropsWithChildren<ConfirmationModalProps>) {
   return (
     <Modal onClose={onCancel} open={open} className={className}>
-      <div className="flex flex-col overflow-hidden rounded shadow-lg bg-hoverElement py-3 px-3.5">
+      <div className="flex flex-col overflow-hidden shadow-lg py-3 px-3.5 rounded bg-element min-h-[350px] w-[90%] max-w-[900px]">
         {children}
         <section className="flex gap-2 pt-3">
           <button

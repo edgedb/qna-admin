@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "../utils";
+import { cn } from "./utils";
+import { GetCurrentUserReturns } from "../lib/discord/queries/getCurrentUser.query";
 
 interface HeaderProps {
   links: { href: string; label: string }[];
-  moderator: any;
+  moderator: GetCurrentUserReturns;
   signoutUrl: string;
 }
 

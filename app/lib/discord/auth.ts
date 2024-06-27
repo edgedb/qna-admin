@@ -4,6 +4,7 @@ import { REST } from "@discordjs/rest";
 import { Routes, APIGuildMember, APIUser } from "discord-api-types/v10";
 import { client } from "../../lib/edgedb";
 import { discordGuildId, authorizedRoleIds } from "../../envs";
+import { getCurrentUser } from "./queries/getCurrentUser.query";
 
 export async function discordSignin({
   discordToken,
@@ -51,15 +52,10 @@ export async function discordSignin({
   );
 }
 
-export async function getCurrentUser(authToken: string) {
-  return client
-    .withGlobals({ "ext::auth::client_token": authToken })
-    .querySingle(
-      `select (global current_moderator) {
-        email,
-        account: {
-          name, user_id
-        }
-      } `
-    );
+export async function getCurrentModerator(authToken: string) {
+  const clientWithGlobals = client.withGlobals({
+    "ext::auth::client_token": authToken,
+  });
+
+  return getCurrentUser(clientWithGlobals);
 }

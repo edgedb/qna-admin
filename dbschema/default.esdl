@@ -8,6 +8,14 @@ module default {
     ))
   );
 
+  abstract type Singleton {
+    delegated constraint exclusive on (true);
+  }
+
+  type Prompt extending Singleton {
+    required content: str;
+  }
+
   abstract type User {
     name: str;
     required user_id: str {
@@ -27,8 +35,20 @@ module default {
     }
   }
 
+  type Tag {
+    required name: str {
+      constraint exclusive;
+    };
+
+    disabled: bool {
+      default := false; 
+    };
+
+    qnas := .<linkedTags[is QNA];
+  }
+
+  # make messages required
   abstract type Thread {
-    title: str;
     multi messages: Message {
       on target delete allow
     };
@@ -38,41 +58,21 @@ module default {
     first_msg := (select .messages limit 1).content;
   }
 
-  type Tag {
-    required name: str {
-      constraint exclusive;
-    }
+  abstract type Message {
+    required author: User;
+    required content: str;
+    required created_at: datetime {
+      default := datetime_current()
+    };
 
-    qnas := .<linkedTags[is QNA];
-  }
+    attachments: array<str>; 
 
-  type QNA {
-    required title: str;
-    required question: str;
-    required answer: str;
-    multi linkedTags: Tag {
-      on target delete allow;
-    }
-    tags := .linkedTags.name;
-
-    required thread: Thread {
-      constraint exclusive;
-    }
-
-    index fts::index on ((
+    index fts::index on (
       fts::with_options(
-        .title,
+        .content,
         language := fts::Language.eng
-      ),
-      fts::with_options(
-        .question,
-        language := fts::Language.eng
-      ),
-      fts::with_options(
-      .answer,
-      language := fts::Language.eng
-    )
-  ));
+      )
+    );
   }
 
   type QNADraft {
@@ -101,20 +101,36 @@ module default {
     ));
   }
 
-  abstract type Message {
-    required author: User;
-    required content: str;
-    required created_at: datetime {
-      default := datetime_current()
+  type QNA {
+    required title: str;
+    required question: str;
+    required answer: str;
+    # do we wanna leave deletion policy here just in case
+    # maybe we decide at some point we wanna delete some tag
+    multi linkedTags: Tag {
+      on target delete allow;
+    }
+    tags := .linkedTags.name;
+
+    required thread: Thread {
+      constraint exclusive;
     }
 
-    attachments: array<str>; 
-
-    index fts::index on (
+    index fts::index on ((
       fts::with_options(
-        .content,
+        .title,
         language := fts::Language.eng
+      ),
+      fts::with_options(
+        .question,
+        language := fts::Language.eng
+      ),
+      fts::with_options(
+      .answer,
+      language := fts::Language.eng
       )
-    );
+    ));
   }
 }
+
+

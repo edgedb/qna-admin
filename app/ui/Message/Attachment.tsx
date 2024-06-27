@@ -1,12 +1,5 @@
 import Image from "next/image";
 import { FileIcon } from "@/app/ui/icons";
-// import styles from "../../qna-mod.module.scss";
-import { cn } from "../../utils";
-
-interface AttachmentProps {
-  url: string;
-  className?: string;
-}
 
 const isImage = (url: string): boolean => {
   return url.match(/\.(jpg|jpeg|png|gif)(?:\?|$)/i) !== null;

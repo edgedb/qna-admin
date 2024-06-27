@@ -9,15 +9,14 @@ import {
   InteractionType,
   MessageFlags,
   RESTPostAPIApplicationCommandsJSONBody,
-  Routes,
 } from "discord-api-types/v10";
-import {Command} from "../command";
-import {Bot} from "../bot";
-import {isHelpfulThread} from "../queries/isHelpfulThread.query";
+import { Command } from "../command";
+import { Bot } from "../bot";
+import { isHelpfulThread } from "../queries/isHelpfulThread.query";
 import downloadThreadMessages from "../utils/downloadThread";
-import {suggestThread} from "../queries/suggestThread.query";
+import { suggestThread } from "../queries/suggestThread.query";
 import createReviewCard from "../utils/reviewCard";
-import {addReviewCard} from "../queries/addReviewCard.query";
+import { addReviewCard } from "../queries/addReviewCard.query";
 
 export default class HelpfulCommand
   implements Command<APIChatInputApplicationCommandInteractionData>
@@ -124,7 +123,6 @@ export default class HelpfulCommand
       suggestorId: interaction.member.user.id,
       suggestorName: interaction.member.user.username,
       threadId: threadChannel.id,
-      threadName: threadChannel.name!,
     });
 
     const reviewCard = await createReviewCard(bot, threadSuggestion);

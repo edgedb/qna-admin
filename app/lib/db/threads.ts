@@ -1,56 +1,75 @@
 "use server";
 
 import { createClient } from "edgedb";
-import e from "./../../../dbschema/edgeql-js";
+import e from "@/dbschema/edgeql-js";
 import { auth, client } from "@/app/lib/edgedb";
+import { getFtsThreadsCount } from "./queries/getFtsThreadsCount.query";
+import { getFtsThreads } from "./queries/getFtsThreads.query";
+import { getThreadsCount } from "./queries/getThreadsCount.query";
 
-const getThreadsQuery = e.select(e.Thread, (thread) => ({
-  id: true,
-  title: true,
-  messages: {
-    author: {
-      name: true,
-    },
-    created_at: true,
-    content: true,
-    attachments: true,
-    limit: 5,
+// message type from getThread
+export interface MessageT {
+  id: string;
+  content: string;
+  created_at: Date;
+  author: {
+    name: string | null;
+  };
+  attachments: string[] | null;
+}
+
+const getThreadsQuery = e.params(
+  {
+    offset: e.int32,
+    limit: e.int16,
   },
-  filter: e.op(
-    e.op("not", e.op("exists", thread.draft)),
-    "and",
-    e.op("not", e.op("exists", thread.qna))
-  ),
-  limit: 10,
-}));
-
-export async function getFtsThreads(str: string) {
-  return client.query(
-    `\
-      with res := (
-      select fts::search(Thread, ${str}, language := 'eng')
-    )
-    select res.object {
-      id, 
-      title,
-      score := res.score, 
+  ({ offset, limit }) =>
+    e.select(e.discord.Thread, (thread) => ({
+      id: true,
       messages: {
-        id, 
-        author: {
-          name
-          },
-        attachments
-        }
-      }
-    order by res.score desc;`,
-    { str }
-  );
+        content: true,
+        created_at: true,
+        limit: 5,
+      },
+      filter: e.op(
+        e.op("not", e.op("exists", thread.draft)),
+        "and",
+        e.op("not", e.op("exists", thread.qna))
+      ),
+      offset: offset,
+      limit: limit,
+    }))
+);
+
+const ITEMS_PER_PAGE = 10;
+
+export interface ThreadEssential {
+  id: string;
+  messages: {
+    content: string;
+    created_at: Date;
+  }[];
 }
 
-export async function getThreads(query: string) {
-  if (query) return getFtsThreads(query);
-  return getThreadsQuery.run(client);
-}
+export const getThreads = (currentPage: number, query?: string) => {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  if (query)
+    return getFtsThreads(client, { query, offset, limit: ITEMS_PER_PAGE });
+  return getThreadsQuery.run(client, { offset, limit: ITEMS_PER_PAGE });
+};
+
+export const getThreadsPages = async (query?: string) => {
+  let count = 0;
+
+  if (query) {
+    count = await getFtsThreadsCount(client, { query });
+  } else {
+    count = await getThreadsCount(client);
+  }
+
+  return Math.ceil(count / ITEMS_PER_PAGE);
+};
 
 const getThreadQuery = e.params(
   {
@@ -59,15 +78,14 @@ const getThreadQuery = e.params(
   ({ id }) =>
     e.select(e.discord.Thread, () => ({
       id: true,
-      title: true,
       messages: {
         id: true,
+        content: true,
+        created_at: true,
         author: {
           name: true,
         },
         attachments: true,
-        created_at: true,
-        content: true,
       },
       filter_single: { id },
     }))
@@ -82,13 +100,13 @@ const deleteThreadQuery = e.params(
     id: e.uuid,
   },
   ({ id }) => {
-    return e.delete(e.Thread, () => ({
+    return e.delete(e.discord.Thread, () => ({
       filter_single: { id },
     }));
   }
 );
 
-export const deleteThread = async (id: string) => {
+export const dbDeleteThread = async (id: string) => {
   const session = auth.getSession();
 
   const client = createClient().withGlobals({
@@ -107,7 +125,7 @@ const updateMessageQuery = e.params(
     content: e.str,
   },
   ({ id, content }) => {
-    return e.update(e.Message, () => ({
+    return e.update(e.discord.Message, () => ({
       filter_single: { id },
       set: {
         content: content,
@@ -116,7 +134,7 @@ const updateMessageQuery = e.params(
   }
 );
 
-export const updateMessage = async (id: string, content: string) => {
+export const dbUpdateMsg = async (id: string, content: string) => {
   const session = auth.getSession();
 
   const client = createClient().withGlobals({
@@ -134,13 +152,13 @@ const deleteMessageQuery = e.params(
     id: e.uuid,
   },
   ({ id }) => {
-    return e.delete(e.Message, () => ({
+    return e.delete(e.discord.Message, () => ({
       filter_single: { id },
     }));
   }
 );
 
-export const deleteMessage = async (id: string) => {
+export const dbDeleteMsg = async (id: string) => {
   const session = auth.getSession();
 
   const client = createClient().withGlobals({

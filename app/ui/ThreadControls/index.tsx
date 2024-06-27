@@ -1,13 +1,12 @@
 "use client";
 
 import { dbUpdate } from "@/app/lib/utils";
-
-import { createDraft, deleteThread } from "./actions";
+import { createDraftAction, deleteThreadAction } from "./actions";
 
 export default function ThreadControls({ id }: { id: string }) {
-  async function createDraftToast(threadId: string) {
+  async function createDraft() {
     try {
-      await dbUpdate(createDraft(threadId), {
+      await dbUpdate(createDraftAction(id), {
         pending: "Creating QNA draft...",
         success: "QNA draft created!",
         error: "Failed to create QNA draft.",
@@ -17,9 +16,9 @@ export default function ThreadControls({ id }: { id: string }) {
     }
   }
 
-  async function deleteThreadToast(threadId: string) {
+  async function deleteThread() {
     try {
-      await dbUpdate(deleteThread(threadId), {
+      await dbUpdate(deleteThreadAction(id), {
         pending: "Deleting thread...",
         success: "Thread deleted!",
         error: "Failed to delete thread.",
@@ -32,13 +31,13 @@ export default function ThreadControls({ id }: { id: string }) {
   return (
     <div>
       <button
-        onClick={() => deleteThreadToast(id)}
+        onClick={deleteThread}
         className="text-xs py-1 px-2 bg-accentRed rounded text-black hover:text-black hover:bg-hoverRed transition-colors mr-2"
       >
         DELETE THREAD
       </button>
       <button
-        onClick={() => createDraftToast(id)}
+        onClick={createDraft}
         className="text-xs py-1 px-2 bg-accentGreen rounded text-black hover:text-black hover:bg-hoverGreen transition-colors"
       >
         CREATE A DRAFT

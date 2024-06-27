@@ -1,10 +1,9 @@
-import { ReactElement } from "react";
-import { cn } from "../utils";
+import { cn } from "./utils";
 
 interface InputProps {
-  className?: string;
   value: string;
   onChange: (value: string) => void;
+  className?: string;
 }
 
 export default function Input({ value, onChange, className }: InputProps) {

@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 import { HTMLAttributes, ReactNode, forwardRef } from "react";
-import { cn } from "../utils";
+import { cn } from "./utils";
 
 interface IconButtonProps extends HTMLAttributes<HTMLDivElement> {
   icon: ReactNode;

@@ -3,6 +3,8 @@
 import createClient from "edgedb";
 import { client, auth } from "@/app/lib/edgedb";
 import e from "@/dbschema/edgeql-js";
+import { getFtsDraftsCount } from "./queries/getFtsDraftsCount.query";
+import { getFtsDrafts } from "./queries/getFtsDrafts.query";
 
 interface DraftBody {
   prompt?: string | undefined;
@@ -20,71 +22,53 @@ interface PublishBody {
   tags: string[];
 }
 
+export interface DraftEssential {
+  id: string;
+  title: string | null;
+  question: string | null;
+  linkedTags: {
+    name: string;
+    disabled: boolean | null;
+  }[];
+}
+
 const getDraftsQuery = e.params(
   {
     offset: e.int32,
     limit: e.int16,
   },
   ({ offset, limit }) =>
-    e.select(e.default.QNADraft, () => ({
+    e.select(e.QNADraft, () => ({
       id: true,
       title: true,
       question: true,
-      answer: true,
-      tags: true,
+      linkedTags: {
+        name: true,
+        disabled: true,
+      },
       offset: offset,
       limit: limit,
     }))
 );
 
-export async function getFtsDrafts(
-  query: string,
-  offset: number,
-  limit: number
-) {
-  return client.query(
-    `\
-      with res := (
-      select fts::search(QNADraft, <str>$query, language := 'eng')
-    )
-    select res.object {
-      id, 
-      title, 
-      question,
-      answer,
-      tags,
-      score := res.score
-    } 
-    order by res.score desc
-    offset <int32>$offset
-    limit <int16>$limit;`,
-    { query, offset, limit }
-  );
-}
-
 const ITEMS_PER_PAGE = 10;
 
-export const getDrafts = (query: string, currentPage: number) => {
+export const getDrafts = (currentPage: number, query?: string) => {
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-  if (query) return getFtsDrafts(query, offset, ITEMS_PER_PAGE);
+  if (query) {
+    return getFtsDrafts(client, { query, offset, limit: ITEMS_PER_PAGE });
+  }
   return getDraftsQuery.run(client, { offset, limit: ITEMS_PER_PAGE });
 };
 
-export const getDraftsPages = async (query: string) => {
+export const getDraftsPages = async (query?: string) => {
   let count = 0;
 
   if (query) {
-    count = await client.query(
-      `\
-        with res := (
-        select fts::search(QNADraft, <str>$query, language := 'eng')
-      )
-      select count(res.object)`,
-      { query }
-    );
+    count = await getFtsDraftsCount(client, { query });
   } else {
-    count = await e.select(e.count(e.QNADraft)).run(client);
+    count = await e.count(e.QNADraft).run(client);
   }
 
   return Math.ceil(count / ITEMS_PER_PAGE);
@@ -104,7 +88,6 @@ const getDraftQuery = e.params(
       prompt: true,
       thread: {
         id: true,
-        title: true,
         messages: (message) => ({
           id: true,
           content: true,
@@ -112,7 +95,6 @@ const getDraftQuery = e.params(
             name: true,
           },
           attachments: true,
-          created_at: true,
           order_by: {
             expression: message.created_at,
             direction: "ASC",
@@ -122,6 +104,8 @@ const getDraftQuery = e.params(
       filter_single: { id },
     }))
 );
+
+export type DraftT = Awaited<ReturnType<typeof getDraft>>;
 
 export const getDraft = async (id: string) => {
   return getDraftQuery.run(client, { id });
@@ -137,7 +121,7 @@ const upsertDraftQuery = e.params(
     threadId: e.uuid,
   },
   (params) => {
-    const thread = e.select(e.Thread, (thread) => ({
+    const thread = e.select(e.discord.Thread, (thread) => ({
       first_msg: true,
       filter_single: e.op(thread.id, "=", params.threadId),
     }));
@@ -169,23 +153,20 @@ const upsertDraftQuery = e.params(
           })),
         })),
       () => ({
-        question: true,
-        answer: true,
-        prompt: true,
-        tags: true,
         id: true,
       })
     );
   }
 );
 
-export const upsertDraft = async (id: string, body: DraftBody) => {
+export const dbUpsertDraft = async (id: string, body: DraftBody) => {
   const session = auth.getSession();
 
   const client = createClient().withGlobals({
     "ext::auth::client_token": session.authToken,
   });
 
+  console.log("draft", body);
   return upsertDraftQuery.run(client, {
     threadId: id,
     ...body,
@@ -203,7 +184,7 @@ const deleteDraftQuery = e.params(
   }
 );
 
-export const deleteDraft = async (id: string) => {
+export const dbDeleteDraft = async (id: string) => {
   const session = auth.getSession();
 
   const client = createClient().withGlobals({
@@ -240,15 +221,11 @@ const createQNAQuery = e.params(
       }),
       () => ({
         id: true,
-        title: true,
-        question: true,
-        answer: true,
-        tags: true,
       })
     )
 );
 
-export const createQNA = async (body: PublishBody) => {
+export const dbCreateQNA = async (body: PublishBody) => {
   const session = auth.getSession();
 
   const client = createClient().withGlobals({
@@ -257,26 +234,3 @@ export const createQNA = async (body: PublishBody) => {
 
   return createQNAQuery.run(client, body);
 };
-
-export async function generateSummary(draftId: string, body: any) {
-  const res = await fetch(
-    new URL(`/drafts/${draftId}/generate`, process.env.QNA_API_URL),
-    {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: {
-        Authorization: `Bearer ${process.env.QNA_API_SECRET}`,
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "text/event-stream",
-      },
-    }
-  );
-
-  if (res.ok) {
-    return res.json();
-  }
-
-  throw new Error(
-    `api call failed with status ${res.status}: ${await res.text()}`
-  );
-}

@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import Input from "./Input";
 import Modal from "./Modal";
 import { GPTLogo } from "./icons";
@@ -30,12 +29,12 @@ export default function PromptBoxModal({
       open={open}
       className="max-w-[900px] w-[90%] max-h-[600px] relative rounded bg-[#ebebeb] transition-transform"
     >
-      <div className="overflow-auto w-full h-full max-w-[900px] max-h-[600px] pb-12 rounded">
+      <div className="overflow-auto w-full h-full max-w-[900px] max-h-[600px] px-1.5 pt-1.5 pb-14 rounded">
         <Input onChange={setEditedContent} value={editedContent} />
-        <GPTLogo className="w-10 h-10 text-element z-[1] p-1 absolute top-1 right-1" />
-        <section className="absolute left-2 bottom-2 flex gap-2 mt-3 z-20">
+        <GPTLogo className="w-10 h-10 text-element z-[1] p-1 absolute top-1.5 right-1.5" />
+        <section className="absolute left-3 bottom-3 flex gap-2 mt-3 z-20">
           <button
-            className="outline-none border-none py-1 h-fit px-2 text-xs rounded bg-accentOrange hover:bg-hoverOrange"
+            className="outline-none border-none py-1 h-fit px-2 text-xs rounded bg-[#55585e] hover:bg-placeholder"
             onClick={close}
           >
             CANCEL

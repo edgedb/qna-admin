@@ -1,26 +1,19 @@
 "use client";
 
 import { useState } from "react";
-
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Code } from "../Code";
-import { cn } from "../../utils";
+import { cn } from "../utils";
 import IconButton from "../IconButton";
-import {
-  CloseIcon,
-  CopiedIcon,
-  DeleteIcon,
-  EditIcon,
-  UndoIcon,
-} from "../icons";
+import { CopiedIcon, DeleteIcon, EditIcon, UndoIcon } from "../icons";
 import Input from "../Input";
-import { deleteMessage, updateMessage } from "@/app/lib/db/threads";
+import { type MessageT, dbDeleteMsg, dbUpdateMsg } from "@/app/lib/db/threads";
 import { dbUpdate } from "@/app/lib/utils";
 import Attachment from "./Attachment";
 
 interface MessageProps {
-  msg: any;
+  msg: Omit<MessageT, "created_at">;
   className?: string;
   editable?: boolean;
 }
@@ -42,10 +35,10 @@ export default function Message({
     setEditedContent(message);
   };
 
-  const saveEdit = async () => {
+  const updateMessage = async () => {
     if (editedContent !== message) {
       try {
-        await dbUpdate(updateMessage(msg.id, editedContent), {
+        await dbUpdate(dbUpdateMsg(msg.id, editedContent), {
           pending: "Updating message...",
           success: "Message updated!",
           error: "Failed to update message.",
@@ -59,9 +52,9 @@ export default function Message({
     setIsEditing(false);
   };
 
-  const onDelete = async () => {
+  const deleteMessage = async () => {
     try {
-      await dbUpdate(deleteMessage(msg.id), {
+      await dbUpdate(dbDeleteMsg(msg.id), {
         pending: "Deleting message...",
         success: "Message deleted!",
         error: "Failed to delete message.",
@@ -90,7 +83,7 @@ export default function Message({
                   ></IconButton>
                 )}
                 <IconButton
-                  onClick={saveEdit}
+                  onClick={updateMessage}
                   icon={<CopiedIcon className="mt-[3px]" />}
                   className="text-accentGreen hover:text-hoverGreen"
                 ></IconButton>
@@ -98,7 +91,7 @@ export default function Message({
             ) : (
               <div className="flex gap-0.5 -mt-1 -mr-1.5">
                 <IconButton
-                  onClick={onDelete}
+                  onClick={deleteMessage}
                   icon={<DeleteIcon />}
                   className="text-accentRed hover:text-hoverRed"
                 />
@@ -112,13 +105,9 @@ export default function Message({
           </>
         )}
       </div>
-      <div className="">
+      <div>
         {isEditing ? (
-          <Input
-            className=""
-            value={editedContent}
-            onChange={setEditedContent}
-          />
+          <Input value={editedContent} onChange={setEditedContent} />
         ) : (
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}

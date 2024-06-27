@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Header from "./ui/Header";
-import { getCurrentUser } from "./lib/discord/auth";
+import { getCurrentModerator } from "./lib/discord/auth";
 import { auth } from "./lib/edgedb";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -20,6 +20,7 @@ const links = [
   { href: "/drafts", label: "DRAFTS" },
   { href: "/qnas", label: "QNAS" },
   { href: "/tags", label: "TAGS" },
+  { href: "/prompt", label: "PROMPT" },
 ];
 
 export default async function RootLayout({
@@ -30,7 +31,7 @@ export default async function RootLayout({
   const session = auth.getSession();
 
   const currentModerator = session.authToken
-    ? await getCurrentUser(session.authToken)
+    ? await getCurrentModerator(session.authToken)
     : null;
 
   const signoutUrl = auth.getSignoutUrl();

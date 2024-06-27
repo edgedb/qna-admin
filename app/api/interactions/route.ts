@@ -1,13 +1,12 @@
 import {
-  APIBaseInteraction,
   InteractionResponseType,
   InteractionType,
 } from "discord-api-types/v10";
-import { Bot } from "../discord/bot";
+import { Bot } from "@/app/lib/discord/bot";
 import { discordClientPublicKey, discordToken } from "@/app/envs";
 import { NextResponse } from "next/server";
 import createClient from "edgedb";
-import { verifyInteractionRequest } from "../discord/verify-interaction-request";
+import { verifyInteractionRequest } from "@/app/lib/discord/verify-interaction-request";
 
 const bot = new Bot(createClient(), discordToken);
 await bot.initialize();

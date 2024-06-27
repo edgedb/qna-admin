@@ -1,6 +1,6 @@
 import { codeBlock, oneLine } from "common-tags";
 import { getThread } from "@/app/lib/db/threads";
-import { getTags } from "@/app/lib/db/tags";
+import { getActiveTags } from "@/app/lib/db/tags";
 
 const openAiKey = process.env.OPENAI_KEY;
 
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
     const msgStr = messages?.join("\n\n");
 
-    const tags = (await getTags()).map((tag) => tag.name);
+    const tags = (await getActiveTags()).map((tag) => tag.name);
 
     // Moderate the content to comply with OpenAI T&C
     const sanitizedUiPrompt = uiPrompt.trim();

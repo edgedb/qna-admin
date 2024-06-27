@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { SSE } from "sse.js";
-
 import Input from "../Input";
 import IconButton from "../IconButton";
 import { Code } from "../Code";
@@ -16,49 +14,23 @@ import {
   parseQNASummary,
   dbUpdate,
 } from "@/app/lib/utils";
-import { QNADraft } from "@/dbschema/interfaces";
 import PromptBoxModal from "../PromptBoxModal";
 import ParsedControls from "./ParsedControls";
-import { publishQNA } from "./actions";
+import { deleteDraftAction, publishQNAAction } from "./actions";
 import PublishModal from "../PublishModal";
-import {
-  deleteDraft as deleteDraftInDB,
-  upsertDraft,
-} from "@/app/lib/db/drafts";
-import { revalidatePath } from "next/cache";
-import { useRouter } from "next/navigation";
+import { type DraftT, dbUpsertDraft } from "@/app/lib/db/drafts";
 
 interface ControlPanelProps {
-  draft: any;
-  tagsOptions: any;
+  draft: NonNullable<DraftT>;
+  tagsOptions: string[];
+  defaultPrompt: string;
 }
-
-const defaultPrompt = `
-Summarize the following conversation into a FAQ with question, answer, title 
-and tags. Choose tags only from the provided list of tags. If no tags make 
-sense return empty array for tags. Include markdown when sending code 
-snippets. Make sure to capture the answer within the following messages and 
-include that in the summarized version.
-
-Use the following format to summarize:
-**Title**
-...
-
-**Tags**
-...
-
-**Question**
-...
-
-**Answer**
-...`;
 
 export default function ControlPanel({
   draft,
   tagsOptions,
+  defaultPrompt,
 }: ControlPanelProps) {
-  const router = useRouter();
-
   const { thread } = draft;
 
   const [prompt, setPrompt] = useState<string>(draft.prompt ?? defaultPrompt);
@@ -90,7 +62,7 @@ export default function ControlPanel({
     }
 
     try {
-      await dbUpdate(upsertDraft(thread.id, { prompt: value }), {
+      await dbUpdate(dbUpsertDraft(thread.id, { prompt: value }), {
         pending: "Updating prompt...",
         success: "Prompt updated!",
         error: "Failed to change prompt.",
@@ -140,7 +112,7 @@ export default function ControlPanel({
   const parseSummary = async () => {
     try {
       // try to parse
-      const parsed = parseQNASummary(summarized);
+      const parsed = parseQNASummary(summarized!);
 
       if (!parsed) {
         setParseFailed(true);
@@ -149,7 +121,11 @@ export default function ControlPanel({
 
       setParseFailed(false);
 
-      await upsertDraft(thread.id, parsed);
+      await dbUpdate(dbUpsertDraft(thread.id, parsed), {
+        pending: "Updating draft...",
+        success: "Draft updated!",
+        error: "Failed to update draft.",
+      });
 
       setParsed({ ...parsed });
     } catch (err: any) {
@@ -159,9 +135,9 @@ export default function ControlPanel({
     }
   };
 
-  const onUpdateDraft = async (content: Partial<QNASummary>) => {
+  const updateDraft = async (content: Partial<QNASummary>) => {
     try {
-      await dbUpdate(upsertDraft(thread.id, content), {
+      await dbUpdate(dbUpsertDraft(thread.id, content), {
         pending: "Updating draft...",
         success: "Draft updated!",
         error: "Failed to update draft.",
@@ -178,9 +154,9 @@ export default function ControlPanel({
     setEditing(false);
   };
 
-  const onPublish = async (content: any) => {
+  const publishQNA = async (content: any) => {
     try {
-      await dbUpdate(publishQNA({ ...content, draftId: draft.id }), {
+      await dbUpdate(publishQNAAction({ ...content, draftId: draft.id }), {
         pending: "Publishing QNA...",
         success: "QNA published!",
         error: "Failed to create QNA.",
@@ -191,20 +167,13 @@ export default function ControlPanel({
     }
   };
 
-  async function deleteDraft(draftId: string) {
+  async function deleteDraft() {
     try {
-      await dbUpdate(
-        (async () => {
-          await deleteDraftInDB(draftId);
-          router.refresh();
-          router.push("/drafts");
-        })(),
-        {
-          pending: "Deleting draft...",
-          success: "Draft deleted!",
-          error: "Failed to delete draft.",
-        }
-      );
+      await dbUpdate(deleteDraftAction(draft.id), {
+        pending: "Deleting draft...",
+        success: "Draft deleted!",
+        error: "Failed to delete draft.",
+      });
     } catch (err) {
       console.error(err);
     }
@@ -231,7 +200,7 @@ export default function ControlPanel({
             </button>
             <button
               disabled={isGenerating}
-              className="outline-none border-none py-1 px-2 h-fit text-xs rounded bg-[#424549] hover:bg-[#55585e] disabled:bg-[#35373a]"
+              className="outline-none border-none py-1 px-2 h-fit text-xs rounded bg-[#55585e] hover:bg-placeholder disabled:bg-[#35373a]"
               onClick={() => setPromptOpen(true)}
             >
               PROMPT
@@ -239,7 +208,7 @@ export default function ControlPanel({
             <button
               disabled={isGenerating}
               className="outline-none border-none py-1 px-2 h-fit text-xs rounded bg-accentRed hover:bg-hoverRed"
-              onClick={() => deleteDraft(draft.id)}
+              onClick={deleteDraft}
             >
               DELETE
             </button>
@@ -321,12 +290,12 @@ export default function ControlPanel({
         {parsed && (
           <PublishModal
             onCancel={() => setPublishModalOpen(false)}
-            onPublish={onPublish}
+            onPublish={publishQNA}
             parsed={parsed}
             open={publishModalOpen}
           />
         )}
-        <div className="min-h-[540px]">
+        <div className="min-h-[400px]">
           <div className="flex justify-between px-4 pt-4">
             <p className="text-title text-sm">PARSED CONTENT</p>
             <div className="flex gap-2">
@@ -340,17 +309,20 @@ export default function ControlPanel({
             </div>
           </div>
 
-          {parseFailed && (
-            <div className="text-accentRed">Unable to parse result</div>
-          )}
-          {parsed && (
-            <ParsedControls
-              parsed={parsed}
-              onChange={onUpdateDraft}
-              className="mt-4"
-              tagsOptions={tagsOptions}
-              isDraft={true}
-            />
+          {parseFailed ? (
+            <div className="text-accentRed ml-4">
+              Result not parsed. Try again.
+            </div>
+          ) : (
+            parsed && (
+              <ParsedControls
+                parsed={parsed}
+                onChange={updateDraft}
+                className="mt-4"
+                tagsOptions={tagsOptions}
+                isDraft={true}
+              />
+            )
           )}
         </div>
       </div>
@@ -358,7 +330,7 @@ export default function ControlPanel({
   );
 }
 
-const tryParse = (draft: QNADraft): QNASummary | undefined => {
+const tryParse = (draft: NonNullable<DraftT>): QNASummary | undefined => {
   if (draft.title && draft.question && draft.answer) {
     return {
       answer: draft.answer,

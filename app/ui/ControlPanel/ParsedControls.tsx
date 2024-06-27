@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
 import TextInput from "../TextInput";
-import { CopiedIcon, EditIcon, SaveIcon, UndoIcon } from "@/app/ui/icons";
+import { CopiedIcon, EditIcon, UndoIcon } from "@/app/ui/icons";
 import IconButton from "../IconButton";
-import { QNASummary } from "../utils";
+import { QNASummary } from "@/app/lib/utils";
 import EditableMarkdown from "../EditableMarkdown";
 import { cn } from "@/app/utils";
 import MultiSelect from "./MultiSelect";
@@ -21,40 +21,20 @@ function ParsedControls({
   onChange,
   className,
   tagsOptions,
-  isDraft = false,
 }: ParsedPanelProps) {
   const [titleInput, setTitleInput] = useState(parsed.title);
-
   const [questionContent, setQuestionContent] = useState(parsed.question);
   const [editingQuestion, setEditingQuestion] = useState(false);
   const [answerContent, setAnswerContent] = useState(parsed.answer);
   const [editingAnswer, setEditingAnswer] = useState(false);
   const [tags, setTags] = useState(parsed.tags);
 
-  // useEffect(() => {
-  //   if (isDraft) {
-  //     setTitleInput(parsed.title);
-  //     setQuestionContent(parsed.question);
-  //     setAnswerContent(parsed.answer);
-  //     setTags(parsed.tags);
-
-  //     onChange({
-  //       answer: parsed.answer,
-  //       question: parsed.question,
-  //       ...(parsed.tags && { tags: parsed.tags }),
-  //       title: parsed.title,
-  //     });
-  //   }
-  // }, [parsed]);
-
-  const triggerUpdate = () => {
-    onChange({
-      answer: answerContent,
-      question: questionContent,
-      tags: tags,
-      title: titleInput,
-    });
-  };
+  useEffect(() => {
+    setTitleInput(parsed.title);
+    setQuestionContent(parsed.question);
+    setAnswerContent(parsed.answer);
+    setTags(parsed.tags);
+  }, [parsed]);
 
   const conditionalUpdate = () => {
     if (
@@ -62,7 +42,11 @@ function ParsedControls({
       answerContent !== parsed?.answer ||
       titleInput !== parsed?.title
     ) {
-      triggerUpdate();
+      onChange({
+        answer: answerContent,
+        question: questionContent,
+        title: titleInput,
+      });
     }
   };
 
@@ -74,9 +58,14 @@ function ParsedControls({
   return (
     <div className={cn("flex flex-col bg-element rounded p-4 pb-2", className)}>
       <div className="mb-4">
-        <h4 className="flex text-sm">TITLE</h4>
+        <h4 className="flex text-sm">
+          TITLE
+          <span className="text-xs ml-1 text-placeholder leading-5">
+            (click Enter to save the changes)
+          </span>
+        </h4>
         <TextInput
-          onSubmit={triggerUpdate}
+          onSubmit={conditionalUpdate}
           className="my-1 mx-0 text-[15px] border border-border focus:border-[#8d8d8d]"
           value={titleInput}
           onChange={setTitleInput}

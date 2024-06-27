@@ -1,7 +1,5 @@
-// import { useIsOverlayActive } from "@edgedb-site/shared/hooks/useOverlayActive";
-
 import Prism from "prismjs";
-import { cn } from "@/app/utils";
+import { cn } from "@/app/ui/utils";
 
 let isLoaded = false;
 function loadGrammars() {
@@ -68,7 +66,7 @@ export function Code({
     return (
       <span
         className={cn(
-          "relative overflow-y-hidden overflow-x-auto bg-code rounded text-text w-fit inline-flex py-[1px] px-1.5 leading-[19px]",
+          "relative overflow-y-hidden overflow-x-auto bg-code rounded w-fit inline-flex py-[1px] px-1.5 leading-[19px]",
           prismCls,
           className
         )}

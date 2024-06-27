@@ -1,86 +1,63 @@
 "use server";
 
 import { createClient } from "edgedb";
-import e from "../../../dbschema/edgeql-js";
+import e from "@/dbschema/edgeql-js";
 import { auth } from "@/app/lib/edgedb";
-import { Identity } from "@/dbschema/edgeql-js/modules/ext/auth";
+import { getFtsQnasCount } from "./queries/getFtsQnasCount.query";
+import { getFtsQnas } from "./queries/getFtsQnas.query";
 
 const client = createClient();
 
-interface UpdateQNABody {
+interface UpdateQnaBody {
   title?: string;
   question?: string;
   answer?: string;
   tags?: string[];
 }
 
-const getQNAsQuery = e.params(
+const getQnasQuery = e.params(
   {
     offset: e.int32,
     limit: e.int16,
   },
   ({ offset, limit }) =>
-    e.select(e.default.QNA, () => ({
+    e.select(e.QNA, () => ({
       id: true,
       title: true,
       question: true,
-      answer: true,
-      tags: true,
+      linkedTags: {
+        name: true,
+        disabled: true,
+      },
       offset: offset,
       limit: limit,
     }))
 );
 
-export async function getFtsQNAs(query: string, offset: number, limit: number) {
-  return client.query(
-    `\
-      with res := (
-      select fts::search(QNA, <str>$query, language := 'eng')
-    )
-    select res.object {
-      id, 
-      title,
-      question,
-      answer,
-      tags,
-      score := res.score
-    } 
-    order by res.score desc
-    offset <int32>$offset
-    limit <int16>$limit;`,
-    { query, offset, limit }
-  );
-}
-
 const ITEMS_PER_PAGE = 10;
 
-export const getQNAs = (query: string, currentPage: number) => {
+export const getQnas = (currentPage: number, query?: string) => {
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-  if (query) return getFtsQNAs(query, offset, ITEMS_PER_PAGE);
-  return getQNAsQuery.run(client, { offset, limit: ITEMS_PER_PAGE });
+  if (query) {
+    return getFtsQnas(client, { query, offset, limit: ITEMS_PER_PAGE });
+  }
+  return getQnasQuery.run(client, { offset, limit: ITEMS_PER_PAGE });
 };
 
-export const getQNAsPages = async (query: string) => {
+export const getQnasPages = async (query?: string) => {
   let count = 0;
 
   if (query) {
-    count = await client.query(
-      `\
-        with res := (
-        select fts::search(QNA, <str>$query, language := 'eng')
-      )
-      select count(res.object)`,
-      { query }
-    );
+    count = await getFtsQnasCount(client, { query });
   } else {
-    count = await e.select(e.count(e.QNADraft)).run(client);
+    count = await e.count(e.QNA).run(client);
   }
 
   return Math.ceil(count / ITEMS_PER_PAGE);
 };
 
-const getQNAQuery = e.params(
+const getQnaQuery = e.params(
   {
     id: e.uuid,
   },
@@ -95,8 +72,10 @@ const getQNAQuery = e.params(
     }))
 );
 
-export const getQNA = async (id: string) => {
-  return getQNAQuery.run(client, { id });
+export type QnaT = Awaited<ReturnType<typeof getQna>>;
+
+export const getQna = async (id: string) => {
+  return getQnaQuery.run(client, { id });
 };
 
 const updateQNAQuery = e.params(
@@ -107,32 +86,21 @@ const updateQNAQuery = e.params(
     answer: e.optional(e.str),
     tags: e.optional(e.array(e.str)),
   },
-  (params) => {
-    return e.select(
-      e.update(e.QNA, (q) => ({
-        filter_single: { id: params.id },
-        set: {
-          title: e.op(params.title, "??", q.title),
-          question: e.op(params.question, "??", q.question),
-          answer: e.op(params.answer, "??", q.answer),
-          linkedTags: e.select(e.Tag, (tag) => ({
-            filter: e.op(tag.name, "in", e.array_unpack(params.tags)),
-          })),
-        },
-      })),
-
-      () => ({
-        id: true,
-        title: true,
-        question: true,
-        answer: true,
-        tags: true,
-      })
-    );
-  }
+  (params) =>
+    e.update(e.QNA, (q) => ({
+      filter_single: { id: params.id },
+      set: {
+        title: e.op(params.title, "??", q.title),
+        question: e.op(params.question, "??", q.question),
+        answer: e.op(params.answer, "??", q.answer),
+        linkedTags: e.select(e.Tag, (tag) => ({
+          filter: e.op(tag.name, "in", e.array_unpack(params.tags)),
+        })),
+      },
+    }))
 );
 
-export const updateQNA = async (id: string, body: UpdateQNABody) => {
+export const dbUpdateQna = async (id: string, body: UpdateQnaBody) => {
   const session = auth.getSession();
 
   const client = createClient().withGlobals({

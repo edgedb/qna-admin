@@ -2,31 +2,39 @@
 
 import Link from "next/link";
 import { ArrowRightIcon } from "./icons";
-import { cn } from "../utils";
+import { cn } from "./utils";
+import type { DraftEssential } from "../lib/db/drafts";
 
 export default function QNACard({
-  qna,
+  data,
   baseHref,
 }: {
-  qna: any;
+  data: DraftEssential;
   baseHref: string;
 }) {
-  const { title, question, tags } = qna;
+  const { id, title, question, linkedTags } = data;
 
   return (
     <Link
-      href={`${baseHref}/${qna.id}`}
+      href={`${baseHref}/${id}`}
       className="rounded flex py-3 pl-3 pr-1.5 mb-4 items-center bg-element hover:bg-activeElement transition-colors justify-between"
     >
       <div className="w-fit relative">
         <div
           className={cn(
-            "text-xs text-accentOrange flex gap-2",
-            tags.length && "mb-1.5"
+            "text-xs flex gap-2",
+            linkedTags.length ? "mb-1.5" : ""
           )}
         >
-          {tags.map((tag: string) => (
-            <span key={`${qna.id}-${tag}`}>#{tag}</span>
+          {linkedTags.map(({ name, disabled }) => (
+            <span
+              key={`${id}-${name}`}
+              className={`${
+                disabled ? "text-placeholder" : "text-accentGreen"
+              }`}
+            >
+              #{name}
+            </span>
           ))}
         </div>
         <p className="line-clamp-1 text-elipsis my-0">
