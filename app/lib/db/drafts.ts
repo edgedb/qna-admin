@@ -122,16 +122,23 @@ const upsertDraftQuery = e.params(
   },
   (params) => {
     const thread = e.select(e.discord.Thread, (thread) => ({
-      first_msg: true,
+      messages: true,
       filter_single: e.op(thread.id, "=", params.threadId),
     }));
+
+    const first_msg = e.array_agg(
+      e.select(thread.messages, () => ({
+        content: true,
+        limit: 1,
+      }))
+    )[0];
 
     return e.select(
       e
         .insert(e.QNADraft, {
           thread: thread,
           title: params.title,
-          question: e.op(params.question, "??", thread.first_msg),
+          question: e.op(params.question, "??", first_msg.content),
           answer: params.answer,
           linkedTags: e.select(e.Tag, (tag) => ({
             filter: e.op(tag.name, "in", e.array_unpack(params.tags)),

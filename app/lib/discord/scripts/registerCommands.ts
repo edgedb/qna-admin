@@ -21,7 +21,7 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 await rest.put(
   Routes.applicationGuildCommands(
     process.env.APPLICATION_ID!,
-    process.env.GUILD_ID!
+    process.env.DISCORD_GUILD_ID!
   ),
   {
     body: commands.map((c) => c.definition),

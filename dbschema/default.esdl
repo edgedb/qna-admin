@@ -55,7 +55,6 @@ module default {
 
     draft := .<thread[is QNADraft];
     qna := .<thread[is QNA];
-    first_msg := (select .messages limit 1).content;
   }
 
   abstract type Message {
