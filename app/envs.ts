@@ -1,8 +1,3 @@
-if (!process.env.API_SECRET) {
-  throw new Error(`API_SECRET env var not configured`);
-}
-export const apiSecret = `Bearer ${process.env.API_SECRET}`;
-
 if (!process.env.DISCORD_CLIENT_PUBLIC_KEY) {
   throw new Error("DISCORD_CLIENT_PUBLIC_KEY env var not configured");
 }

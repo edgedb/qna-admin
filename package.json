@@ -5,13 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "setup": "npx @edgedb/generate edgeql-js",
     "start": "next start",
     "lint": "next lint",
     "commands": "cross-env tsx app/api/discord/scripts/registerCommands.ts"
   },
   "dependencies": {
     "@discordjs/rest": "^2.2.0",
-    "@edgedb/auth-nextjs": "file:../edgedb-js/packages/auth-nextjs",
+    "@edgedb/auth-nextjs": "^0.3.1",
     "@edgedb/generate": "^0.5.3",
     "common-tags": "^1.8.2",
     "date-fns": "^3.6.0",
