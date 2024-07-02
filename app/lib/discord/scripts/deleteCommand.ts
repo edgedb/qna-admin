@@ -3,7 +3,7 @@ import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
 
 dotenv.config();
-dotenv.config({ path: ".env.local" });
+dotenv.config({ path: ".env.prod" });
 
 if (!process.env.DISCORD_TOKEN) {
   console.error("DISCORD_TOKEN environment variable is not set.");
@@ -23,7 +23,7 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN!);
 //     Routes.applicationGuildCommand(
 //       process.env.APPLICATION_ID!,
 //       process.env.DISCORD_GUILD_ID!,
-//       "commandId"
+//       "1157365753314553900"
 //     )
 //   )
 //   .then(() => console.log("Successfully deleted guild command"))

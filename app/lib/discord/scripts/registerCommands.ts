@@ -4,7 +4,7 @@ import { loadCommandDefinitions } from "../command";
 import { Routes } from "discord-api-types/v10";
 
 dotenv.config();
-dotenv.config({ path: ".env.local" });
+dotenv.config({ path: ".env.prod" });
 
 (async function () {
   if (!process.env.DISCORD_TOKEN) {
@@ -26,5 +26,5 @@ dotenv.config({ path: ".env.local" });
     }
   );
 
-  console.log("Successfully registered application commands.");
+  console.log("Successfully registered guild commands.");
 })();
