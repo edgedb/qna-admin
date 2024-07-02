@@ -6,6 +6,7 @@ import {
 } from "discord-api-types/v10";
 import { Bot } from "../bot";
 import { SuggestThreadReturns } from "../queries/suggestThread.query";
+import { reviewChannelId } from "@/app/envs";
 
 const createReviewCard = async (
   bot: Bot,
@@ -34,17 +35,14 @@ const createReviewCard = async (
     color: 0x0ccb93,
   };
 
-  const message = (await bot.post(
-    Routes.channelMessages(process.env.REVIEW_CHANNEL_ID!),
-    {
-      body: {
-        embeds: [embed],
-      },
-    }
-  )) as APIMessage;
+  const message = (await bot.post(Routes.channelMessages(reviewChannelId), {
+    body: {
+      embeds: [embed],
+    },
+  })) as APIMessage;
 
   const reviewThread = (await bot.post(
-    Routes.threads(process.env.REVIEW_CHANNEL_ID!, message.id),
+    Routes.threads(reviewChannelId, message.id),
     {
       body: {
         name: `Thread Review: ${thread.thread_id}`,

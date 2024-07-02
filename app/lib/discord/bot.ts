@@ -14,6 +14,7 @@ import { REST, RESTOptions } from "@discordjs/rest";
 import { Client } from "edgedb";
 import { InteractionPromise } from "./interactionPromise";
 import { getHelpChannels } from "./queries/getHelpChannels.query";
+import { applicationId } from "@/app/envs";
 
 export class Bot extends REST {
   public readonly edgedb: Client;
@@ -26,7 +27,7 @@ export class Bot extends REST {
   constructor(edgedb: Client, token: string, options?: Partial<RESTOptions>) {
     super(options);
 
-    this.applicationId = process.env.APPLICATION_ID!;
+    this.applicationId = applicationId;
 
     this.edgedb = edgedb;
     this.token = token;

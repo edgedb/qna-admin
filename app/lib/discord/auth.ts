@@ -3,7 +3,7 @@
 import { REST } from "@discordjs/rest";
 import { Routes, APIGuildMember, APIUser } from "discord-api-types/v10";
 import { client } from "../../lib/edgedb";
-import { discordGuildId, authorizedRoleIds } from "../../envs";
+import { discordGuildId, authorizedRoleIds } from "@/app/envs";
 import { getCurrentUser } from "./queries/getCurrentUser.query";
 
 export async function discordSignin({
