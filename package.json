@@ -33,6 +33,7 @@
     "use-debounce": "^10.0.1"
   },
   "devDependencies": {
+    "@types/common-tags": "^1.8.4",
     "@types/node": "^20",
     "@types/react": "^18.2.8",
     "@types/react-dom": "^18",

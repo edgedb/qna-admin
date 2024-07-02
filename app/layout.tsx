@@ -51,7 +51,7 @@ export default async function RootLayout({
             <Header
               links={links.slice(1)}
               signoutUrl={signoutUrl}
-              moderator={currentModerator.account.name}
+              moderator={currentModerator.account.name!}
             />
 
             {children}
