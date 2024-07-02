@@ -6,8 +6,6 @@ import {
   InteractionResponseType,
   InteractionType,
   MessageFlags,
-  RESTPostAPIChannelMessageJSONBody,
-  RESTPostAPIChannelWebhookJSONBody,
   RESTPostAPIWebhookWithTokenJSONBody,
   Routes,
 } from "discord-api-types/v10";

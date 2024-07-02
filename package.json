@@ -8,7 +8,8 @@
     "setup": "npx @edgedb/generate edgeql-js",
     "start": "next start",
     "lint": "next lint",
-    "commands": "cross-env tsx app/api/discord/scripts/registerCommands.ts"
+    "commands": "cross-env tsx app/lib/discord/scripts/registerCommands.ts",
+    "delete-command": "cross-env tsx app/lib/discord/scripts/deleteCommand.ts"
   },
   "dependencies": {
     "@discordjs/rest": "^2.2.0",
