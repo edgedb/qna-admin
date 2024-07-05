@@ -15,12 +15,13 @@ const getTagsQuery = e.select(e.Tag, () => ({
   disabled: true,
 }));
 
-export const getAllTags = () => {
+export const getTags = () => {
   return getTagsQuery.run(client);
 };
 
 const getActiveTagsQuery = e.select(e.Tag, (t) => ({
   name: true,
+  count: e.count(t.qnas),
   filter: e.op(t.disabled, "?!=", true),
 }));
 

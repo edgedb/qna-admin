@@ -14,7 +14,7 @@ export default async function QNAs({
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const totalPages = await getQnasPages(query);
-  const qnas = await getQnas(currentPage, query);
+  const qnas = await getQnas({ currentPage, query });
   const noItems = !query && !qnas.length;
 
   return (

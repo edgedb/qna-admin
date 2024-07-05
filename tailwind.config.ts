@@ -5,13 +5,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        element: "var(--grey14)",
-        hoverElement: "var(--grey18)",
-        activeElement: "var(--grey20)",
+        black: "#141414",
+        text: "var(--text)",
+        title: "var(--title)",
+        element: "var(--element)",
+        hoverElement: "#2e2e2e",
+        activeElement: "#333333",
         placeholder: "#666",
         border: "#525252",
         accentViolet: "var(--accentViolet)",
-        hoverViolet: "var(--lightViolet)",
+        hoverViolet: "var(--hoverViolet)",
         accentGreen: "var(--accentGreen)",
         hoverGreen: "var(--hoverGreen)",
         accentBlue: "var(--accentBlue)",
@@ -20,11 +23,7 @@ const config: Config = {
         hoverRed: "var(--hoverRed)",
         accentOrange: "var(--accentOrange)",
         hoverOrange: "var(--hoverOrange)",
-        disabledOrange: "var(--disabledOrange)",
-        title: "var(--grey80)",
-        code: "var(--grey8)",
-        text: "var(--grey)",
-        black: "var(--grey8)",
+        disabledOrange: "#a45c0a",
       },
       backgroundImage: {
         "search-icon": "url('/search-icon.svg')",

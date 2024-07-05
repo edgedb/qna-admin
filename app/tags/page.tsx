@@ -1,8 +1,8 @@
-import { getAllTags } from "../lib/db/tags";
+import { getTags } from "../lib/db/tags";
 import TagsPanel from "../ui/TagsPanel";
 
 export default async function Tags() {
-  const tags = await getAllTags();
+  const tags = await getTags();
 
   return <TagsPanel tags={tags} />;
 }

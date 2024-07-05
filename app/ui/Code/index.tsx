@@ -66,7 +66,7 @@ export function Code({
     return (
       <span
         className={cn(
-          "relative overflow-y-hidden overflow-x-auto bg-code rounded w-fit inline-flex py-[1px] px-1.5 leading-[19px]",
+          "relative overflow-y-hidden overflow-x-auto bg-black rounded w-fit inline-flex py-[1px] px-1.5 leading-[19px]",
           prismCls,
           className
         )}
@@ -86,7 +86,7 @@ export function Code({
   return (
     <div
       className={cn(
-        "relative overflow-y-hidden overflow-x-auto bg-code rounded text-text mt-2 mb-1 py-2 px-2",
+        "relative overflow-y-hidden overflow-x-auto bg-black rounded text-text mt-2 mb-1 py-2 px-2",
         prismCls,
         className
       )}

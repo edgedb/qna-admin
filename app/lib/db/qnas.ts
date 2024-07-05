@@ -19,9 +19,10 @@ const getQnasQuery = e.params(
   {
     offset: e.int32,
     limit: e.int16,
+    tag: e.optional(e.str),
   },
-  ({ offset, limit }) =>
-    e.select(e.QNA, () => ({
+  ({ offset, limit, tag }) =>
+    e.select(e.QNA, (q) => ({
       id: true,
       title: true,
       question: true,
@@ -29,6 +30,7 @@ const getQnasQuery = e.params(
         name: true,
         disabled: true,
       },
+      filter: e.op(e.op(tag, "in", q.tags), "??", true),
       offset: offset,
       limit: limit,
     }))
@@ -36,13 +38,20 @@ const getQnasQuery = e.params(
 
 const ITEMS_PER_PAGE = 10;
 
-export const getQnas = (currentPage: number, query?: string) => {
+interface QNAs {
+  currentPage?: number;
+  query?: string;
+  tag?: string;
+}
+
+export const getQnas = ({ currentPage = 1, query, tag }: QNAs) => {
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   if (query) {
     return getFtsQnas(client, { query, offset, limit: ITEMS_PER_PAGE });
   }
-  return getQnasQuery.run(client, { offset, limit: ITEMS_PER_PAGE });
+
+  return getQnasQuery.run(client, { offset, limit: ITEMS_PER_PAGE, tag });
 };
 
 export const getQnasPages = async (query?: string) => {

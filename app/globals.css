@@ -4,28 +4,17 @@
 
 :root {
   --background: #1a1a1a;
-  --grey: #a6a6a6;
-  --grey6: #0f0f0f;
-  --grey8: #141414;
-  --grey10: #1a1a1a;
-  --grey12: #1f1f1f;
-  --grey14: #242424;
-  --grey18: #2e2e2e;
-  --grey20: #333333;
-  --grey30: #4d4d4d;
-  --grey45: #737373;
-  --grey80: #ccc;
-  --grey40: #666;
-  --grey50: #808080;
+  --text: #a6a6a6;
+  --element: #242424;
+  --title: #ccc;
   --accentViolet: #8280ff;
-  --lightViolet: #9b99ff;
+  --hoverViolet: #9b99ff;
   --accentRed: 175 99 99;
   --hoverRed: #c15151;
   --accentGreen: #279474;
   --hoverGreen: #33c399;
   --accentOrange: #f5ab56;
   --hoverOrange: #f28f1e;
-  --disabledOrange: #a45c0a;
   --accentBlue: #277e94;
   --hoverBlue: #2f98b3;
 
@@ -37,11 +26,11 @@
   --syntaxText: #333333;
   --syntaxComment: #7f7f7f;
 
-  --toastify-color-info: var(--grey14) !important;
+  --toastify-color-info: var(--element) !important;
   --toastify-color-success: var(--accentGreen) !important;
   --toastify-color-error: var(--accentRed) !important;
   --toastify-color-warning: var(--accentOrange) !important;
-  --toastify-text-color-light: var(--grey14) !important;
+  --toastify-text-color-light: var(--element) !important;
 
   .Toastify__progress-bar {
     opacity: 1;
@@ -70,7 +59,7 @@ body {
   h3,
   h4,
   h5 {
-    color: var(--grey80);
+    color: var(--title);
   }
 
   h3 {
@@ -80,7 +69,7 @@ body {
 
   p,
   label {
-    color: var(--grey);
+    color: var(--text);
     font-size: 15px;
   }
 
@@ -92,7 +81,7 @@ body {
     color: var(--accentViolet);
 
     &:hover {
-      color: Var(--lightViolet);
+      color: var(--hoverViolet);
     }
   }
 
@@ -102,7 +91,7 @@ body {
 
   ol,
   ul {
-    color: var(--grey);
+    color: var(--text);
     padding-left: 20px;
     margin-bottom: 4px;
 

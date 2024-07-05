@@ -33,7 +33,7 @@ export default async function Thread({
           <div className="min-h-[calc(100vh-216px)] h-full">
             <Search className="mb-6" placeholder="Search for threads..." />
             {threads.map((thread) => (
-              <ThreadCard key={thread.id} thread={thread} />
+              <ThreadCard key={thread.id} thread={thread} page={currentPage} />
             ))}
           </div>
         )}

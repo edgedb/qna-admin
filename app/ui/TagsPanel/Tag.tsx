@@ -66,7 +66,7 @@ export default function Tag({ id, name, disabled }: TagT) {
           onChange={setEditedTag}
         />
       ) : (
-        <span>{name}</span>
+        <span className="flex items-center">{name}</span>
       )}
       <div className="flex gap-0.5 items-center">
         {isEditing ? (
