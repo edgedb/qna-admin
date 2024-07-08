@@ -10,8 +10,8 @@ if (!process.env.DISCORD_TOKEN) {
   process.exit(1);
 }
 
-if (!process.env.APPLICATION_ID) {
-  console.error("APPLICATION_ID environment variable is not set.");
+if (!process.env.DISCORD_CLIENT_ID) {
+  console.error("DISCORD_CLIENT_ID environment variable is not set.");
   process.exit(1);
 }
 
@@ -21,7 +21,7 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN!);
 // rest
 //   .delete(
 //     Routes.applicationGuildCommand(
-//       process.env.APPLICATION_ID!,
+//       process.env.DISCORD_CLIENT_ID!,
 //       process.env.DISCORD_GUILD_ID!,
 //       "1157365753314553900"
 //     )
@@ -31,6 +31,6 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN!);
 
 // for global commands
 rest
-  .delete(Routes.applicationCommand(process.env.APPLICATION_ID, "commandId"))
+  .delete(Routes.applicationCommand(process.env.DISCORD_CLIENT_ID, "commandId"))
   .then(() => console.log("Successfully deleted global command"))
   .catch(console.error);

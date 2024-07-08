@@ -1,7 +1,7 @@
-if (!process.env.APPLICATION_ID) {
-  throw new Error("APPLICATION_ID env var not configured");
+if (!process.env.DISCORD_CLIENT_ID) {
+  throw new Error("CLIENT_ID env var not configured");
 }
-export const applicationId = process.env.APPLICATION_ID;
+export const discordClientId = process.env.DISCORD_CLIENT_ID;
 
 if (!process.env.DISCORD_CLIENT_PUBLIC_KEY) {
   throw new Error("DISCORD_CLIENT_PUBLIC_KEY env var not configured");

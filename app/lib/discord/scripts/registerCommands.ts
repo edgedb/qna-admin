@@ -18,7 +18,7 @@ dotenv.config({ path: ".env.prod" });
 
   await rest.put(
     Routes.applicationGuildCommands(
-      process.env.APPLICATION_ID!,
+      process.env.DISCORD_CLIENT_ID!,
       process.env.DISCORD_GUILD_ID!
     ),
     {
