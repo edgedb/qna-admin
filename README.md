@@ -35,9 +35,9 @@ This project requires the following environment variables:
 
 `OPENAI_KEY`: We use OpenAI for helping us generate summarized QNAs out of all data we provide to the GPT. You can find the Secret API key on the [API key page](https://platform.openai.com/api-keys) of your OpenAI project.
 
-`DISCORD_CLIENT_ID`: You can find it on [Discord developer portal](https://discord.com/developers/applications) on the "General Information" page of your bot application.
+`DISCORD_CLIENT_ID`: Navigate to [Discord developer portal](https://discord.com/developers/applications). Open your bot app. Once you are there, on the "General Information" page you will find the APPLICATION ID.
 
-`DISCORD_CLIENT_PUBLIC_KEY`: This is just next to the client (application) ID in the Discord developer portal.
+`DISCORD_CLIENT_PUBLIC_KEY`: This is just under the client (application) ID in the Discord developer portal.
 
 `DISCORD_TOKEN`: It is needed for authenticating users on admin panel with Discord. It can be found on Discord developer portal too in the OAuth2 section of the app.
 
