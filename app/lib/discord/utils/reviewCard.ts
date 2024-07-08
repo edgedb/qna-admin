@@ -29,12 +29,11 @@ const createReviewCard = async (
       },
       {
         name: "Moderation link",
-        value: `https://qna.edgedb.com/moderation/PLACEHOLDER`,
+        value: `${process.env.BASE_URL}/threads/${thread.id}`,
       },
     ],
     color: 0x0ccb93,
   };
-
   const message = (await bot.post(Routes.channelMessages(reviewChannelId), {
     body: {
       embeds: [embed],

@@ -1,5 +1,5 @@
 if (!process.env.DISCORD_CLIENT_ID) {
-  throw new Error("CLIENT_ID env var not configured");
+  throw new Error("DISCORD_CLIENT_ID env var not configured");
 }
 export const discordClientId = process.env.DISCORD_CLIENT_ID;
 
