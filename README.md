@@ -191,6 +191,8 @@ This project requires the following environment variables:
   You will see in the left sidebar the section "Getting Started". There you
   will find the instance name.
 
+  > For local development EDGEDB_INSTANCE and EDGEDB_SECRET_KEY are not needed.
+
 - `EDGEDB_SECRET_KEY`: You need to generate this key. You can do it by running
 
   ```
@@ -198,6 +200,8 @@ This project requires the following environment variables:
   ```
 
   in the project root, or navigating to the same page and section where you got the instance name.
+
+  > For local development EDGEDB_INSTANCE and EDGEDB_SECRET_KEY are not needed.
 
 - `OPENAI_KEY`: We use OpenAI for helping us generate summarized QNAs out of
   all data we provide to the GPT. You can find the Secret API key on the
