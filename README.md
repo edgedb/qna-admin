@@ -1,22 +1,42 @@
 # QNA Admin Panel with Discord Bot
 
-This project is used for creating QNA examples that you can find on (EdgeDB docs website)[https://docs.edgedb.com/q+a].
-The data used for these QNAs is taken from Discord chats inside various channels of EdgeDB Discord server.
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app), and using (App Router)[https://nextjs.org/docs/app].
+This project is used for creating QNA examples that you can find on
+[EdgeDB docs website](https://docs.edgedb.com/q+a). The data used for these
+QNAs is taken from Discord chats inside various channels of EdgeDB Discord server.
+
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app), and using [App Router](https://nextjs.org/docs/app).
 
 It consists of 2 parts:
 
-- `Discord Bot` which is used to mark some threads in Discord as important (helpful) which will save them in the EdgeDB database once they are marked as helpful. For this we use Discord [slash commands](https://discord.com/developers/docs/interactions/application-commands). Commands can be run only by certain users inside EdgeDB Discord server. These users have a special [Role](https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101) `moderators` inside the EdgeDB guild (server). The bot code is contained in this [folder](https://github.com/edgedb/qna-admin/tree/main/app/lib/discord). The API for command interactions is inside the [route handler](https://github.com/edgedb/qna-admin/blob/main/app/api/interactions/route.ts).
+- `Discord Bot` which is used to mark some threads in Discord as important
+  (helpful) and save them in the EdgeDB database. For this we use Discord [slash commands](https://discord.com/developers/docs/interactions/application-commands). Commands can be run only by certain users inside EdgeDB
+  Discord server. These users have a special [Role](https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101)
+  `moderators` inside the EdgeDB guild (server). The bot code is contained in
+  this [folder](https://github.com/edgedb/qna-admin/tree/main/app/lib/discord).
+  The API for command interactions is inside the [route handler](https://github.com/edgedb/qna-admin/blob/main/app/api/interactions/route.ts).
 
-The bot has 2 commands:
+  The bot has 2 commands:
 
-- `/help-channels` to add, list or remove some channel as the channel whose threads can be marked as important.
-- `/helpful` the command that actually marks some thread as important inside the channel that is one of the "help-channels".
+  - `/help-channels` to add, list or remove some channel as the channel whose
+    threads can be marked as important.
+  - `/helpful` the command that actually marks a thread as important inside
+    some on the help channels.
 
-So when someone run these commands the request will be sent to the interactions endpoint and will be handled there: HelpChannels and Threads in the database will be updated.
+  So when someone run these commands the request will be sent to the interactions
+  endpoint and will be handled there: HelpChannels and Threads in the database
+  will be updated.
 
 - `Admin Panel` UI where these threads are loaded, reviewed, updated and
-  summarized into questions and answers. Only `moderators` has the ability to log in to the admin panel and moderate threads in order to create QNAs. We use EdgeDB Auth with Discord provider for this. During login we check if the user has `moderators` role inside the Discord EdgeDB server and he/she will be allowed to proceed only if he/she has the role. We also use OpenAI to help us summarize threads into QNAs. Check both the code for the pages inside the Admin panel and the [schema folder](https://github.com/edgedb/qna-admin/tree/main/dbschema) to understand better the full flow.
+  summarized into questions and answers. Only `moderators` has the ability to
+  log in to the admin panel and moderate threads in order to create QNAs. We
+  use `EdgeDB Auth` with Discord provider for this. During login we check if
+  the user has `moderators` role inside the Discord EdgeDB server and he/she
+  will be allowed to proceed only if the role is present.
+
+  We also use `OpenAI` to help us summarize threads into QNAs.
+
+  Check both the code for the Admin panel and the [schema folder](https://github.com/edgedb/qna-admin/tree/main/dbschema)
+  to understand better the whole flow.
 
 ## Getting Started
 
