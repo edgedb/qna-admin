@@ -110,7 +110,7 @@ This section guides you through the process of setting up this project for your 
 
    a. Create a new application in the [Discord Developer Portal](https://discord.com/developers/applications).
 
-   b. In the "General Information" page, set the "INTERACTIONS ENDPOINT URL" to:
+   b. On the "General Information" page, set the "INTERACTIONS ENDPOINT URL" to:
       - Local development: `{NGROK_URL}/api/interactions`
       - Production: `{DEPLOYED_APP_URL}/api/interactions`
 
@@ -147,7 +147,7 @@ This section guides you through the process of setting up this project for your 
 
    - `DISCORD_GUILD_ID`: Right-click on your Discord server icon and select "Copy Server ID". If using Discord in a browser, this is the first number in the URL after `https://discord.com/channels/`.
 
-   - `REVIEW_CHANNEL_ID`: Right-click on the channel name in Discord and select "Copy Channel ID". In a browser, this is the second number in the URL when viewing the channel.
+   - `REVIEW_CHANNEL_ID`: Right-click on the channel name in Discord and select "Copy Channel ID". In a browser, this is the second number in the URL when viewing the channel. Ideally, this should be a newly created channel where you want to receive notifications when a thread is marked as helpful.
 
    - `DISCORD_MODERATION_ACCESS_ROLES`: Comma-separated list of role IDs that can access the admin panel. To get a role ID, go to Server Settings > Roles, then right-click on a role and select "Copy Role ID".
 
@@ -204,7 +204,7 @@ This section guides you through the process of setting up this project for your 
 
     In your Discord server, use the `/help-channels add` command in each channel you want to monitor for helpful threads.
 
-You should now have a fully functioning QnA Admin Panel with an integrated Discord bot!
+You should now have a fully functioning QNA Admin Panel with an integrated Discord bot!
 
 # Deploying
 
