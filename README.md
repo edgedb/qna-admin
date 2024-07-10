@@ -1,243 +1,238 @@
-# QNA Admin Panel with Discord Bot
+# QNA
 
-This project is used for creating QNA examples that you can find on
-[EdgeDB docs website](https://docs.edgedb.com/q+a). The data used for these
-QNAs is taken from Discord chats inside various channels of EdgeDB Discord server.
+This project is designed to create Question and Answer entries for the [EdgeDB docs website](https://docs.edgedb.com/q+a) by leveraging discussions from the EdgeDB Discord server. It combines a Discord bot, an EdgeDB database, and a Next.js web application with OpenAI integration to streamline the process of identifying helpful discussions and transforming them into concise Q&A entries.
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app), and using [App Router](https://nextjs.org/docs/app).
+## System overview
 
-It consists of 2 parts:
+1. **Discord Bot**: Allows moderators to mark helpful threads using the `/helpful` command.
 
-- `Discord Bot` which is used to mark some threads in Discord as important
-  (helpful) and save them in the EdgeDB database. For this we use Discord [slash commands](https://discord.com/developers/docs/interactions/application-commands). Commands can be run only by certain users inside EdgeDB
-  Discord server. These users have a special [Role](https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101)
-  `moderators` inside the EdgeDB guild (server). The bot code is contained in
-  this [folder](https://github.com/edgedb/qna-admin/tree/main/app/lib/discord).
-  The API for command interactions is inside the [route handler](https://github.com/edgedb/qna-admin/blob/main/app/api/interactions/route.ts).
+   - Processes interactions from Discord
+   - Saves marked threads to the EdgeDB database.
 
-  The bot has 2 commands:
+2. **EdgeDB Database**: Data storage.
 
-  - `/help-channels` to add, list or remove some channel as the channel whose
-    threads can be marked as important.
-  - `/helpful` the command that actually marks a thread as important inside
-    some of the help channels.
+   - Stores marked threads from Discord.
+   - Stores processed Q&A entries.
+   - Provides user authentication.
 
-  So when someone run these commands the request will be sent to the interactions
-  endpoint and will be handled there: HelpChannels and Threads in the database
-  will be updated.
+3. **Next.js Web App**: Provides a web interface for moderators to review and process marked threads.
 
-- `Admin Panel` UI where these threads are loaded, reviewed, updated and
-  summarized into questions and answers. Only `moderators` have the ability to
-  log in to the admin panel and moderate threads in order to create QNAs. We
-  use `EdgeDB Auth` with Discord provider for this. During login we check if
-  the user has `moderators` role inside the Discord EdgeDB server and he/she
-  will be allowed to proceed only if the role is present.
+   - Integrates with OpenAI to assist in summarizing threads into Q&A format.
+   - Allows moderators to edit and finalize Q&A entries.
 
-  We also use `OpenAI` to help us summarize threads into QNAs.
+## Moderator Workflow
 
-  Check both the code for the Admin panel and the [schema folder](https://github.com/edgedb/qna-admin/tree/main/dbschema)
-  to understand better the whole flow.
+1. **Identifying Helpful Threads**:
+
+   - Moderators use the `/helpful` command in designated Discord channels to mark insightful discussions.
+   - The Discord bot saves these marked threads to the EdgeDB database.
+
+2. **Reviewing and Processing Threads**:
+
+   - Moderators sign into the Admin app using EdgeDB Auth with the Discord OAuth provider.
+   - The Admin app loads marked threads from the EdgeDB database for review.
+
+3. **Generating Q&A Entries**:
+
+   - Moderators select a thread to process.
+   - The system uses OpenAI to generate an initial Q&A summary from the thread content.
+   - Moderators can edit and refine the AI-generated summary.
+
+4. **Finalizing and Storing Q&As**:
+   - Once satisfied, moderators save the finalized Q&A entry to the EdgeDB database.
+   - These entries become available for use on the EdgeDB docs website.
+
+This Next.js project, bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) and using the [App Router](https://nextjs.org/docs/app), seamlessly integrates these components to create a streamlined workflow for generating high-quality Q&A content from community discussions.
+
+For a deeper understanding of the implementation, refer to the [Discord bot code](https://github.com/edgedb/qna-admin/tree/main/app/lib/discord), the [Admin app code](https://github.com/edgedb/qna-admin/tree/main/app), and the [database schema](https://github.com/edgedb/qna-admin/tree/main/dbschema).
 
 ## Getting Started
 
-In order to be able to use this project for your own QNAs you will need to set up few things.
+This section guides you through the process of setting up this project for your own community. By following these instructions, you'll be able to create a system that captures valuable discussions from your Discord server and transforms them into useful Q&A content.
 
-> In the rest of the readme we assume `http://localhost:3000` for the `BASE_URL`
-> for local development, or the domain where this project is deployed for production.
+> In the rest of this section we assume `http://localhost:3000` for the `BASE_URL` for local development, or the domain where this project is deployed for production.
 
-### EdgeDB database
+### Prerequisites
 
-You need to initialize a project as EdgeDB project and link it to the EdgeDB
-instance. Check [quickstart guide](https://docs.edgedb.com/get-started/quickstart#initialize-a-project).
-In the [edgedb project init docs](https://docs.edgedb.com/cli/edgedb_project/edgedb_project_init#edgedb-project-init)
-you can also find how to link it to the cloud DB. For local development we recommend
-creating new EdgeDB branch and maintain `main` branch for production.
+- Access to an EdgeDB v5 or newer instance. (Our [hosted cloud](https://www.edgedb.com/cloud) is a great option!)
+- A Discord developer account with permissions to create a bot
+- An OpenAI account with API access
 
-### EdgeDB Auth
+### Setup steps
 
-You need to set up the [EdgeDB Auth](https://docs.edgedb.com/guides/auth)
-extension. Open the `EdgeDB UI` with typing `edgedb ui` in the project root.
-Cloud instances you can also directly open at https://cloud.edgedb.com/.
-Provide the CONFIG: `auth_signing_key`, `token_time_to_live` and `allowed_redirect_urls`
-are required. For `allowed_redirect_urls` provide `BASE_URL`.
+1. **EdgeDB Database Setup**
 
-In the PROVIDERS section choose Discord as a provider. You need to get
-`client_id` and `secret` from the Discord application which you can find under
-OAuth2 section in [Discord developer portal](https://discord.com/developers/applications).
-If you still haven't created Discord developer account and the app you can check
-their [quickstart](https://discord.com/developers/docs/quick-start/getting-started)
-tutorial.
+   Initialize the project as an EdgeDB project:
 
-For the `additional_scope` enter `email guilds.members.read identify`.
-More about why we need scopes and what are available ones you can find inside
-[OAuth2 section](https://discord.com/developers/docs/topics/oauth2) of the Discord docs.
+   **Local**:
 
-### Discord Application
+   ```
+   edgedb project init
+   ```
 
-As mentioned in the previous step you will need a Discord bot application.
-To do this follow [Discord guide](https://discord.com/developers/docs/quick-start/getting-started).
-Once you create it navigate to the "General Information" page and look for `INTERACTIONS ENDPOINT URL`.
-Populate this field with `{ADMIN_PANEL_DOMAIN_URL}/api/interactions` for production.
-This is the path where the interactions endpoint is located inside this project
-(where are the handlers for previously mentioned Discord slash commands).
+   **Cloud**:
 
-For local development is a bit trickier, you can't just provide localhost URL.
-You need to expose your local server to the internet under HTTPS URL and for this
-you can use `Ngrok`. Follow their simple [guide](https://ngrok.com/docs/getting-started/)
-to create and connect the account. Once your local server is online copy the
-provided Ngrok URL inside Discord interactions endpoint (with `/api/interactions` at the end).
-Interactions endpoint has to be verified, and for that you need to provide some env vars.
-Go down to the Deployment section and provide `DISCORD_CLIENT_ID`,
-`DISCORD_CLIENT_PUBLIC_KEY` and `DISCORD_TOKEN`.
+   ```
+   edgedb cloud login
+   edgedb instance create <your-github-org>/<your-instance-name>
+   edgedb project init --server-instance <your-github-org>/<your-instance-name>
+   ```
 
-On the "Installation page" you can only leave `Guild install` as the Authorization
-method since our bot is meant to be used within specific guilds (servers).
 
-On the "OAuth2 page" Redirects url has to be provided. You can find it in the
-EdgeDB UI Auth section inside CONFIG panel: `OAuth callback endpoint`.
+2. **EdgeDB Auth Configuration**
 
-### OpenAI API key
+   a. Open EdgeDB UI:
+      ```
+      edgedb ui
+      ```
 
-Lastly, you need to create an [OpenAI account](https://platform.openai.com/signup)
-or [sign in](https://platform.openai.com/login). Next, navigate to the [API key page](https://platform.openai.com/api-keys)
-and "Create new secret key". You can find more info in the
-[OpenAI quickstart](https://platform.openai.com/docs/quickstart) guide.
+   b. In the Auth section, configure the following:
+      - `auth_signing_key`
+      - `token_time_to_live`
+      - `allowed_redirect_urls` (set to your `BASE_URL`)
 
-### Environment variables
+   c. Choose Discord as the provider and configure:
+      - `client_id` and `secret` (obtain from Discord Developer Portal)
+      - Set `additional_scope` to `email guilds.members.read identify`. See the [OAuth2 section](https://discord.com/developers/docs/topics/oauth2) of the Discord docs for more information about scopes.
 
-You should be ready to run the project now on localhost with the vars already
-provided. The rest you can add later. Anyway, whenever you need some help with
-env vars head down to the Deployment section below. The same env vars you have
-to provide for local development.
+3. **Local Development with ngrok** (for Discord bot interactions)
 
-> For local development only you have to add one more env var: `TLS_SECURITY=insecure`.
+   a. Set up an ngrok account and install the ngrok CLI.
 
-## Install dependencies and run the development server
+   b. Start your local server and run:
+      ```
+      ngrok http 3000
+      ```
 
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
-# or
-bun install
-```
+   c. Save the provided ngrok URL for use in the next step.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+4. **Discord Application Setup**
 
-The project should run on [http://localhost:3000](http://localhost:3000).
+   a. Create a new application in the [Discord Developer Portal](https://discord.com/developers/applications).
 
-## Add the Bot to the Discord Server
+   b. On the "General Information" page, set the "INTERACTIONS ENDPOINT URL" to:
+      - Local development: `{NGROK_URL}/api/interactions`
+      - Production: `{DEPLOYED_APP_URL}/api/interactions`
 
-Great. You have created the bot, Admin panel is running and interactions
-endpoint is ready to receive requests from the Discord server. You need to
-connect the bot with the Discord server you want to use bot with. Navigate to the
-Installation page on Discord developer portal. For scopes inside Default
-Install Settings add `application.commands` and `bot`. Copy the Install Link
-from the same screen in the new browser window and choose the server you want
-to add the bot to.
+   c. On the "OAuth2" page, add the "OAuth callback endpoint" from EdgeDB UI Auth section.
 
-Now when you right click on your server inside Discord app and open Server
-Settings -> Integrations you should see the bot there. Click on the bot to
-open the window where you can see (and update) roles and channels that can
-use your bot commands. Let's leave the defaults here, you can update it later
-if you want. No commands are visible because you still didn't load them. You
-can do this by running the [script](https://github.com/edgedb/qna-admin/blob/main/app/lib/discord/scripts/registerCommands.ts).
-Run
+5. **OpenAI API Setup**
 
-```
-npm run commands
-```
+   Create a new secret key by navigating to the [API key page](https://platform.openai.com/api-keys). You can find more info in the [OpenAI quickstart](https://platform.openai.com/docs/quickstart) guide.
 
-in your terminal. Now you need to run `/help-channels add` inside channels you want to observe for
-helpful threads. Make sure to add `REVIEW_CHANNEL_ID` env var to the list of
-vars before running `/helpful`.
+6. **Environment Variables**
 
-> In all the channels you intend to use commands, you have to see the bot online  
-> in the channel's users list. If the channel is private you have to add the
-> bot manually to the channel.
+   Create a `.env.local` file in the project root with the following variables:
+   ```
+   BASE_URL=http://localhost:3000
+   OPENAI_KEY=your_openai_api_key
+   DISCORD_CLIENT_ID=your_discord_client_id
+   DISCORD_CLIENT_PUBLIC_KEY=your_discord_public_key
+   DISCORD_TOKEN=your_discord_bot_token
+   DISCORD_GUILD_ID=your_discord_server_id
+   REVIEW_CHANNEL_ID=your_review_channel_id
+   DISCORD_MODERATION_ACCESS_ROLES=role_id1,role_id2
+   EDGEDB_CLIENT_TLS_SECURITY=insecure
+   ```
 
-## Deploying
+   - `BASE_URL`: The URL where your admin panel is deployed. Use `http://localhost:3000` for local development.
 
-Since this project contains both the QNA admin panel and Discord bot implementation it
-is not advisable to deploy it on Vercel since Vercel uses serverless functions
-for route handlers, [learn more](https://vercel.com/guides/can-i-deploy-discord-bots-to-vercel).
-Because of this we are self-hosting this project on AWS.
+   - `OPENAI_KEY`: Find this on the [API keys page](https://platform.openai.com/api-keys) of your OpenAI account.
 
-### Environment variables
+   - `DISCORD_CLIENT_ID`: In the [Discord Developer Portal](https://discord.com/developers/applications), select your app and find this as "APPLICATION ID" on the "General Information" page.
 
-This project requires the following environment variables:
+   - `DISCORD_CLIENT_PUBLIC_KEY`: Located just below the APPLICATION ID in the Discord Developer Portal.
 
-- `BASE_URL`: This is the URL where the admin panel is deployed. It is needed
-  for setting up the authentication.
+   - `DISCORD_TOKEN`: Found on the "Bot" page in the Discord Developer Portal. You may need to click "Reset Token" to reveal it.
 
-- `EDGEDB_INSTANCE`: You can obtain this value by running the command
+   - `DISCORD_GUILD_ID`: Right-click on your Discord server icon and select "Copy Server ID". If using Discord in a browser, this is the first number in the URL after `https://discord.com/channels/`.
 
-  ```
-  edgedb project info
-  ```
+   - `REVIEW_CHANNEL_ID`: Right-click on the channel name in Discord and select "Copy Channel ID". In a browser, this is the second number in the URL when viewing the channel. Ideally, this should be a newly created channel where you want to receive notifications when a thread is marked as helpful.
 
-  in the project root. You can also find it in the cloud
-  EdgeDB UI at `https://cloud.edgedb.com/org/{org_name}/instance/{instance_name}`.
-  You will see in the left sidebar the section "Getting Started". There you
-  will find the instance name.
+   - `DISCORD_MODERATION_ACCESS_ROLES`: Comma-separated list of role IDs that can access the admin panel. To get a role ID, go to Server Settings > Roles, then right-click on a role and select "Copy Role ID".
 
-  > For local development EDGEDB_INSTANCE and EDGEDB_SECRET_KEY are not needed.
+   For production, specify the appropriate [connection parameters](https://docs.edgedb.com/database/reference/connection), remove `EDGEDB_CLIENT_TLS_SECURITY` and update `BASE_URL` to match your deployed application's base URL.
 
-- `EDGEDB_SECRET_KEY`: You need to generate this key. You can do it by running
+   - `EDGEDB_INSTANCE`: Run `edgedb project info` in the project root, or find it in the EdgeDB Cloud UI under "Getting Started" in the left sidebar.
 
-  ```
-  edgedb cloud secretkey create
-  ```
+   - `EDGEDB_SECRET_KEY` (EdgeDB Cloud only): Generate this key by running `edgedb cloud secretkey create` in the project root, or find it in the same EdgeDB Cloud UI section as the instance name.
 
-  in the project root, or navigating to the same page and section where you got the instance name.
+   Here is an example using EdgeDB cloud:
 
-  > For local development EDGEDB_INSTANCE and EDGEDB_SECRET_KEY are not needed.
+   ```
+   BASE_URL=https://example.com
+   OPENAI_KEY=your_openai_api_key
+   DISCORD_CLIENT_ID=your_discord_client_id
+   DISCORD_CLIENT_PUBLIC_KEY=your_discord_public_key
+   DISCORD_TOKEN=your_discord_bot_token
+   DISCORD_GUILD_ID=your_discord_server_id
+   REVIEW_CHANNEL_ID=your_review_channel_id
+   DISCORD_MODERATION_ACCESS_ROLES=role_id1,role_id2
+   EDGEDB_INSTANCE=your-github-org/your-instance-name
+   EDGEDB_SECRET_KEY=your_edgedb_cloud_secret_key
+   ```
 
-- `OPENAI_KEY`: We use OpenAI for helping us generate summarized QNAs out of
-  all data we provide to the GPT. You can find the Secret API key on the
-  [API key page](https://platform.openai.com/api-keys).
+7. **Install Dependencies and Run the Development Server**
 
-- `DISCORD_CLIENT_ID`: Navigate to [Discord developer portal](https://discord.com/developers/applications).
-  Open your bot app. Once you are there, on the "General Information" page you
-  will find the APPLICATION ID.
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-- `DISCORD_CLIENT_PUBLIC_KEY`: This is just under the APPLICATION ID
-  in the Discord developer portal.
+   The project should now be running on [http://localhost:3000](http://localhost:3000).
 
-- `DISCORD_TOKEN`: It is needed for authenticating users on admin panel with
-  Discord and for interactions endpoint. It can be found on Discord developer
-  portal too on the "Bot" page (`Reset Token` button).
+8. **Add the Bot to Your Discord Server**
 
-- `DISCORD_GUILD_ID`: This is your Discord server ID. You can find it when you
-  go to the Discord app and right click on your server icon. The popup
-  window will open, at the bottom of it is "Copy Server ID" option.
+   a. In the Discord Developer Portal, go to the "Installation" settings.
 
-- `REVIEW_CHANNEL_ID`: We have the special channel in EdgeDB server where we get
-  notifications about all thread recommendations. Its value can be obtained the
-  same way as a the guild id, by right clicking on the channel name, and clicking
-  on the "Copy channel ID" option in the opened popup. Create a channel inside
-  your server that will serve as the Review channel.
+   b. Select "Guild Install" since the bot is meant to be used within a specific guild (server).
 
-  If you use Discord website, you can find the guild ID and the review channel ID
-  in the URL. First slug after the `https://discord.com/channels/` is always the
-  opened server ID, and the second slug is the opened channel ID.
+   c. Select "Discord Provided Link" for the "Install Link", and open the provided URL in a separate browser window or tab.
 
-- `DISCORD_MODERATION_ACCESS_ROLES`: We narrow down using the admin panel only
-  to users with certain roles. You need to get IDs of all the roles you want to
-  allow here. This is done by right clicking on the server icon, choosing Server
-  Settings and choosing Roles. Once you open the Roles panel you can either
-  right click on the role or click on tree docs to copy the Role ID.
+   d. Select your server to add the bot.
 
-### Build command
+   e. Double-check that the bot shows up in your Server Settings > Integrations.
 
-Build command is `next dev` or `npm run dev`.
+9. **Register Bot Commands**
+
+   Run the following command to register the bot's slash commands:
+   ```
+   npm run commands
+   ```
+
+10. **Set Up Help Channels**
+
+    In your Discord server, use the `/help-channels add` command in each channel you want to monitor for helpful threads.
+
+You should now have a fully functioning QNA Admin Panel with an integrated Discord bot!
+
+# Deploying
+
+This application is a Next.js app that runs as a Node.js application and integrates with a Discord bot. When deploying, it's crucial to choose an environment that meets specific requirements for optimal performance and functionality.
+
+## Deployment Requirements
+
+1. **Node.js Support**: 
+   - The deployment environment must support Node.js version 18 or higher.
+   - Ensure the platform can run a long-lived Node.js process.
+
+2. **Non-Serverless Architecture**:
+   - Serverless platforms like Vercel are not suitable for this application. As noted in the [Vercel documentation](https://vercel.com/guides/can-i-deploy-discord-bots-to-vercel), Discord bots require long-running processes, which serverless architectures don't support.
+   - Choose a platform that allows for continuous runtime of the application.
+
+3. **Environment Variable Support**:
+   - The chosen platform must allow setting and securely storing environment variables.
+   - Refer to the "Getting Started" section for the list of required environment variables.
+
+4. **Build and Start Commands**:
+   - The platform should allow specifying custom build and start commands:
+     - Build command: `next build`
+     - Start command: `next start`
+
+5. **HTTPS Support**:
+   - For production deployments, HTTPS is crucial for security, especially when handling Discord authentication.
+   - Either choose a platform with built-in HTTPS support or be prepared to configure it manually (e.g., using a reverse proxy like Nginx with Let's Encrypt).
+
+## Post-Deployment Steps
+
+After successfully deploying your application, ensure you update the Discord Application Settings (if you are sharing the same Discord Application between development and production) to reflect the deployed application's URL in the "INTERACTIONS ENDPOINT URL" in the Discord Developer Portal.
