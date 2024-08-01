@@ -4,7 +4,7 @@ import {
   APIThreadChannel,
   Routes,
 } from "discord-api-types/v10";
-import { Bot } from "../bot";
+import type { Bot } from "../bot";
 import { SuggestThreadReturns } from "../queries/suggestThread.query";
 import { getEnvironment } from "../../../../envs";
 

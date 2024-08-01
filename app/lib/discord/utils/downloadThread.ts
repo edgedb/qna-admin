@@ -1,5 +1,5 @@
 import { APIMessage, APIThreadChannel, Routes } from "discord-api-types/v10";
-import { Bot } from "../bot";
+import type { Bot } from "../bot";
 
 const downloadingInProgress = new Set<string>();
 
