@@ -42,6 +42,9 @@ ENV NODE_ENV production
 ENV BASE_URL https://localhost:3000
 ENV EDGEDB_INSTANCE edgedb/qna
 
+# Copy the .env.production file from the builder stage
+COPY .env.production ./
+
 RUN --mount=type=secret,id=OPENAI_KEY \
     sed -i "s/OPENAI_KEY=/OPENAI_KEY=$(cat /run/secrets/OPENAI_KEY)/" .env.production
 
