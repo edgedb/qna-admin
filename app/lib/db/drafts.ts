@@ -2,7 +2,7 @@
 
 import createClient from "edgedb";
 import { client, auth } from "@/app/lib/edgedb";
-import e, { type $infer } from "@/dbschema/edgeql-js";
+import e from "@/dbschema/edgeql-js";
 import { getFtsDraftsCount } from "./queries/getFtsDraftsCount.query";
 import { getFtsDrafts } from "./queries/getFtsDrafts.query";
 
@@ -42,7 +42,6 @@ const getDraftsQuery = e.params(
       id: true,
       title: true,
       question: true,
-      opa: true,
       linkedTags: {
         name: true,
         disabled: true,
