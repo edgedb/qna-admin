@@ -116,8 +116,6 @@ export default class HelpfulCommand
       messages[0] = refMessage;
     }
 
-    console.log(JSON.stringify(messages));
-
     const threadSuggestion = await suggestThread(bot.edgedb, {
       messages: messages,
       suggestorId: interaction.member.user.id,

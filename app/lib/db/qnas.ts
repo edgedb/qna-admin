@@ -54,11 +54,25 @@ export const getQnas = ({ currentPage = 1, query, tag }: QNAs) => {
   return getQnasQuery.run(client, { offset, limit: ITEMS_PER_PAGE, tag });
 };
 
-export const getQnasPages = async (query?: string) => {
+export const getQnasPages = async ({
+  query,
+  tag,
+}: {
+  query?: string;
+  tag?: string;
+}) => {
   let count = 0;
 
   if (query) {
     count = await getFtsQnasCount(client, { query });
+  } else if (tag) {
+    count = await e
+      .count(
+        e.select(e.QNA, (q) => ({
+          filter: e.op(e.op(tag, "in", q.tags), "??", false),
+        }))
+      )
+      .run(client);
   } else {
     count = await e.count(e.QNA).run(client);
   }

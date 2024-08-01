@@ -173,7 +173,6 @@ export const dbUpsertDraft = async (id: string, body: DraftBody) => {
     "ext::auth::client_token": session.authToken,
   });
 
-  console.log("draft", body);
   return upsertDraftQuery.run(client, {
     threadId: id,
     ...body,

@@ -37,8 +37,7 @@ const gptParseRegex =
 
 export const parseQNASummary = (response: string): QNASummary | undefined => {
   const match = gptParseRegex.exec(response);
-  console.log("response", response);
-  console.log("match", response);
+
   if (!match) {
     return;
   }
