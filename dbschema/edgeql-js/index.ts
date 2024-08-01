@@ -13,7 +13,7 @@ import _fts from "./modules/fts";
 import _schema from "./modules/schema";
 import _sys from "./modules/sys";
 import _default from "./modules/default";
-import __default_10 from "./modules/__default";
+import __default_10 from "./modules/__default_10";
 import _discord from "./modules/discord";
 import _math from "./modules/math";
 

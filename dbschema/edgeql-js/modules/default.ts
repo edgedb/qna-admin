@@ -5,7 +5,7 @@ import * as _ from "../imports";
 import type * as _std from "./std";
 import type * as _extauth from "./ext/auth";
 import type * as _discord from "./discord";
-import type * as ___default from "./__default";
+import type * as ___default from "./__default_10";
 export type $ModeratorλShape = $.typeutil.flatten<
   _std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
     account: $.LinkDesc<
