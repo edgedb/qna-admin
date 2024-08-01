@@ -5,7 +5,7 @@ import {
   InteractionType,
   RESTPostAPIApplicationCommandsJSONBody,
 } from "discord-api-types/v10";
-import {Bot} from "./bot";
+import type { Bot } from "./bot";
 import commands from "./commands";
 
 export interface Command<Interaction = APIApplicationCommandInteractionData> {

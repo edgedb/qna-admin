@@ -11,7 +11,7 @@ import {
   RESTPostAPIApplicationCommandsJSONBody,
 } from "discord-api-types/v10";
 import { Command } from "../command";
-import { Bot } from "../bot";
+import type { Bot } from "../bot";
 import { isHelpfulThread } from "../queries/isHelpfulThread.query";
 import downloadThreadMessages from "../utils/downloadThread";
 import { suggestThread } from "../queries/suggestThread.query";

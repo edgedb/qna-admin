@@ -1,8 +1,6 @@
 import {
-  APIApplicationCommand,
   APIBaseInteraction,
   InteractionType,
-  APIApplicationCommandInteractionData,
   RESTPostAPIApplicationCommandsJSONBody,
   PermissionFlagsBits,
   ApplicationCommandType,
@@ -16,11 +14,10 @@ import {
   MessageFlags,
   InteractionResponseType,
 } from "discord-api-types/v10";
-import {Bot} from "../bot";
-import {Command} from "../command";
-import {getHelpChannels} from "../queries/getHelpChannels.query";
-import {addHelpChannel} from "../queries/addHelpChannel.query";
-import {removeHelpChannel} from "../queries/removeHelpChannel.query";
+import type { Bot } from "../bot";
+import { Command } from "../command";
+import { addHelpChannel } from "../queries/addHelpChannel.query";
+import { removeHelpChannel } from "../queries/removeHelpChannel.query";
 
 export default class HelpChannelCommands
   implements Command<APIChatInputApplicationCommandInteractionData>
@@ -140,11 +137,7 @@ export default class HelpChannelCommands
         });
         break;
       case "add": {
-        const channel = await this.resolveChannel(
-          bot,
-          interaction,
-          subCommand
-        );
+        const channel = await this.resolveChannel(bot, interaction, subCommand);
 
         if (bot["help-channels"].has(channel.id)) {
           respond({
@@ -172,11 +165,7 @@ export default class HelpChannelCommands
         break;
       }
       case "remove": {
-        const channel = await this.resolveChannel(
-          bot,
-          interaction,
-          subCommand
-        );
+        const channel = await this.resolveChannel(bot, interaction, subCommand);
 
         if (!bot["help-channels"].has(channel.id)) {
           respond({
