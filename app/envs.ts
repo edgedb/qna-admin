@@ -7,7 +7,13 @@ export interface Environment {
   reviewChannelId: string;
 }
 
+let environment: Environment | null = null;
+
 export function getEnvironment(): Environment {
+  if (environment) {
+    return environment;
+  }
+
   if (!process.env.DISCORD_CLIENT_ID) {
     throw new Error("DISCORD_CLIENT_ID env var not configured");
   }
@@ -39,12 +45,14 @@ export function getEnvironment(): Environment {
   }
   const reviewChannelId = process.env.REVIEW_CHANNEL_ID;
 
-  return {
+  environment = {
     discordClientId,
     discordClientPublicKey,
     discordToken,
     discordGuildId,
     authorizedRoleIds,
     reviewChannelId,
-  }
+  };
+
+  return environment;
 }
