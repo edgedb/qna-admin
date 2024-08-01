@@ -11,10 +11,22 @@ import {
 } from "discord-api-types/v10";
 import { Command, loadCommands } from "./command";
 import { REST, RESTOptions } from "@discordjs/rest";
-import { Client } from "edgedb";
+import { Client, createClient } from "edgedb";
 import { InteractionPromise } from "./interactionPromise";
 import { getHelpChannels } from "./queries/getHelpChannels.query";
 import { getEnvironment } from "../../../envs";
+
+let bot: Bot | null = null;
+
+export async function getBot(): Promise<Bot> {
+  if (bot) {
+    return bot;
+  }
+
+  bot = new Bot(createClient(), getEnvironment().discordToken);
+  await bot.initialize();
+  return bot;
+}
 
 export class Bot extends REST {
   public readonly edgedb: Client;

@@ -2,7 +2,7 @@ import {
   InteractionResponseType,
   InteractionType,
 } from "discord-api-types/v10";
-import { getBot } from "@/app/lib/discord/getBot";
+import { getBot } from "@/app/lib/discord/bot";
 import { getEnvironment } from "../../../envs";
 import { verifyInteractionRequest } from "@/app/lib/discord/verify-interaction-request";
 
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
   try {
     const bot = await getBot();
-    const result = await bot?.processInteraction(interaction);
+    const result = await bot.processInteraction(interaction);
 
     return Response.json(result);
   } catch (err: any) {
