@@ -3,7 +3,7 @@
 import { REST } from "@discordjs/rest";
 import { Routes, APIGuildMember, APIUser } from "discord-api-types/v10";
 import { client } from "../../lib/edgedb";
-import { discordGuildId, authorizedRoleIds } from "@/app/envs";
+import { getEnvironment } from "../../../envs";
 import { getCurrentUser } from "./queries/getCurrentUser.query";
 
 export async function discordSignin({
@@ -18,14 +18,18 @@ export async function discordSignin({
   );
 
   const discordUser = (await discordClient.get(
-    Routes.userGuildMember(discordGuildId)
+    Routes.userGuildMember(getEnvironment().discordGuildId)
   )) as APIGuildMember;
 
   if (!discordUser) {
     throw new Error("No guild member information for user");
   }
 
-  if (!discordUser.roles.some((role) => authorizedRoleIds.includes(role))) {
+  if (
+    !discordUser.roles.some((role) =>
+      getEnvironment().authorizedRoleIds.includes(role)
+    )
+  ) {
     throw new Error("Discord user does not have any authorized roles");
   }
 

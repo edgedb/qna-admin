@@ -6,7 +6,7 @@ import {
 } from "discord-api-types/v10";
 import { Bot } from "../bot";
 import { SuggestThreadReturns } from "../queries/suggestThread.query";
-import { reviewChannelId } from "@/app/envs";
+import { getEnvironment } from "../../../../envs";
 
 const createReviewCard = async (
   bot: Bot,
@@ -34,6 +34,9 @@ const createReviewCard = async (
     ],
     color: 0x0ccb93,
   };
+
+  const reviewChannelId = getEnvironment().reviewChannelId;
+
   const message = (await bot.post(Routes.channelMessages(reviewChannelId), {
     body: {
       embeds: [embed],

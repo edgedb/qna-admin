@@ -3,17 +3,17 @@ import {
   InteractionType,
 } from "discord-api-types/v10";
 import { Bot } from "@/app/lib/discord/bot";
-import { discordClientPublicKey, discordToken } from "@/app/envs";
+import { getEnvironment } from "../../../envs";
 import createClient from "edgedb";
 import { verifyInteractionRequest } from "@/app/lib/discord/verify-interaction-request";
 
-const bot = new Bot(createClient(), discordToken);
+const bot = new Bot(createClient(), getEnvironment().discordToken);
 await bot.initialize();
 
 export async function POST(req: Request) {
   const verifyResult = await verifyInteractionRequest(
     req,
-    discordClientPublicKey
+    getEnvironment().discordClientPublicKey
   );
 
   if (!verifyResult.isValid || !verifyResult.interaction) {
