@@ -34,3 +34,13 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.actor }}/qna-admin:latest
+          secrets: |
+            "OPENAI_KEY=${{ secrets.OPENAI_KEY }}"
+            "DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}"
+            "DISCORD_CLIENT_PUBLIC_KEY=${{ secrets.DISCORD_CLIENT_PUBLIC_KEY }}"
+            "DISCORD_GUILD_ID=${{ secrets.DISCORD_GUILD_ID }}"
+            "DISCORD_MODERATION_ACCESS_ROLES=${{ secrets.DISCORD_MODERATION_ACCESS_ROLES }}"
+            "REVIEW_CHANNEL_ID=${{ secrets.REVIEW_CHANNEL_ID }}"
+            "DISCORD_CLIENT_ID=${{ secrets.DISCORD_CLIENT_ID }}"
+            "EDGEDB_SECRET_KEY=${{ secrets.EDGEDB_SECRET_KEY }}"
+            "EDGEDB_INSTANCE=${{ secrets.EDGEDB_INSTANCE }}"
