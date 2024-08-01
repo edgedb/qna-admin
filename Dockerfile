@@ -39,35 +39,6 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
-ENV BASE_URL https://localhost:3000
-ENV EDGEDB_INSTANCE edgedb/qna
-
-# Copy the .env.production file from the builder stage
-COPY .env.production ./
-
-RUN --mount=type=secret,id=OPENAI_KEY \
-    sed -i "s/OPENAI_KEY=/OPENAI_KEY=$(cat /run/secrets/OPENAI_KEY)/" .env.production
-
-RUN --mount=type=secret,id=DISCORD_TOKEN \
-    sed -i "s/DISCORD_TOKEN=/DISCORD_TOKEN=$(cat /run/secrets/DISCORD_TOKEN)/" .env.production
-
-RUN --mount=type=secret,id=DISCORD_CLIENT_PUBLIC_KEY \
-    sed -i "s/DISCORD_CLIENT_PUBLIC_KEY=/DISCORD_CLIENT_PUBLIC_KEY=$(cat /run/secrets/DISCORD_CLIENT_PUBLIC_KEY)/" .env.production
-
-RUN --mount=type=secret,id=DISCORD_GUILD_ID \
-    sed -i "s/DISCORD_GUILD_ID=/DISCORD_GUILD_ID=$(cat /run/secrets/DISCORD_GUILD_ID)/" .env.production
-
-RUN --mount=type=secret,id=DISCORD_MODERATION_ACCESS_ROLES \
-    sed -i "s/DISCORD_MODERATION_ACCESS_ROLES=/DISCORD_MODERATION_ACCESS_ROLES=$(cat /run/secrets/DISCORD_MODERATION_ACCESS_ROLES)/" .env.production
-
-RUN --mount=type=secret,id=REVIEW_CHANNEL_ID \
-    sed -i "s/REVIEW_CHANNEL_ID=/REVIEW_CHANNEL_ID=$(cat /run/secrets/REVIEW_CHANNEL_ID)/" .env.production
-
-RUN --mount=type=secret,id=DISCORD_CLIENT_ID \
-    sed -i "s/DISCORD_CLIENT_ID=/DISCORD_CLIENT_ID=$(cat /run/secrets/DISCORD_CLIENT_ID)/" .env.production
-
-RUN --mount=type=secret,id=EDGEDB_SECRET_KEY \
-    sed -i "s/EDGEDB_SECRET_KEY=/EDGEDB_SECRET_KEY=$(cat /run/secrets/EDGEDB_SECRET_KEY)/" .env.production
 
 # Uncomment the following line in case you want to disable telemetry during runtime.
 # ENV NEXT_TELEMETRY_DISABLED 1
