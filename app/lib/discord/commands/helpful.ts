@@ -18,6 +18,9 @@ import { suggestThread } from "../queries/suggestThread.query";
 import createReviewCard from "../utils/reviewCard";
 import { addReviewCard } from "../queries/addReviewCard.query";
 
+// Ignore Needle and EdgeDB Bot messages
+const userIdsToIgnore = ["878399831238909952", "1140618393154756639"];
+
 export default class HelpfulCommand
   implements Command<APIChatInputApplicationCommandInteractionData>
 {
@@ -117,12 +120,13 @@ export default class HelpfulCommand
     }
 
     const threadSuggestion = await suggestThread(bot.edgedb, {
-      messages: messages,
+      messages: messages?.filter(
+        (msg) => !userIdsToIgnore.includes(msg.author.id)
+      ),
       suggestorId: interaction.member.user.id,
       suggestorName: interaction.member.user.username,
       threadId: threadChannel.id,
     });
-
     const reviewCard = await createReviewCard(bot, threadSuggestion);
 
     await addReviewCard(bot.edgedb, {
