@@ -13,12 +13,12 @@
     "delete-command": "cross-env tsx app/lib/discord/scripts/deleteCommand.ts"
   },
   "dependencies": {
-    "@discordjs/rest": "^2.2.0",
+    "@discordjs/rest": "^2.4.0",
     "@edgedb/auth-nextjs": "^0.3.1",
     "@edgedb/generate": "^0.5.4",
     "common-tags": "^1.8.2",
     "date-fns": "^3.6.0",
-    "discord-api-types": "^0.37.66",
+    "discord-api-types": "^0.37.101",
     "discord-interactions": "^3.4.0",
     "edgedb": "1.x",
     "next": "14.2.3",
