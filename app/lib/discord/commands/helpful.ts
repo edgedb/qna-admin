@@ -91,6 +91,7 @@ export default class HelpfulCommand
               `${threadChannel.parent_id}, ${bot["help-channels"].size}, ${ids}}`
             ),
           ],
+          flags: MessageFlags.Ephemeral,
         },
       });
     }
@@ -107,6 +108,7 @@ export default class HelpfulCommand
         embeds: [
           bot.errorEmbed("This thread has already been marked as helpful!"),
         ],
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -137,6 +139,7 @@ export default class HelpfulCommand
 
     await bot.editReply(interaction, {
       content: "Your feedback has been recorded! Thank you!",
+      flags: MessageFlags.Ephemeral,
     });
   }
 }

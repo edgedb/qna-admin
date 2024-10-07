@@ -40,7 +40,6 @@ export class Bot extends REST {
     super(options);
 
     this.applicationId = getEnvironment().discordClientId;
-
     this.edgedb = edgedb;
     this.token = token;
     this.setToken(this.token);
@@ -57,6 +56,19 @@ export class Bot extends REST {
   processInteraction(
     interaction: APIBaseInteraction<InteractionType, any>
   ): InteractionPromise {
+    if (
+      !interaction?.member?.roles.some((role) =>
+        getEnvironment().authorizedRoleIds.includes(role)
+      )
+    ) {
+      return InteractionPromise.resolve(
+        this.errorResponse(
+          `You do not have permission to run this command`,
+          true
+        )
+      );
+    }
+
     switch (interaction.type) {
       case InteractionType.ApplicationCommand:
         const command = interaction as APIBaseInteraction<
@@ -65,8 +77,9 @@ export class Bot extends REST {
         >;
 
         if (!command.data) {
-          console.error("No command data found");
-          return InteractionPromise.resolve(this.errorResponse());
+          return InteractionPromise.resolve(
+            this.errorResponse("No command data found", true)
+          );
         }
 
         const handler = this.commands.get(command.data.name);
@@ -74,7 +87,8 @@ export class Bot extends REST {
         if (!handler) {
           return InteractionPromise.resolve(
             this.errorResponse(
-              `No command found with the name \`${command.data.name}\``
+              `No command found with the name \`${command.data.name}\``,
+              true
             )
           );
         }
@@ -93,7 +107,7 @@ export class Bot extends REST {
         });
       default:
         return InteractionPromise.resolve(
-          this.errorResponse("Unhandled or unimplemented action")
+          this.errorResponse("Unhandled or unimplemented action", true)
         );
     }
   }
