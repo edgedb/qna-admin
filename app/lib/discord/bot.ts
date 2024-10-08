@@ -126,6 +126,7 @@ export class Bot extends REST {
   }
 
   errorEmbed(msg?: string): APIEmbed {
+    console.log("Error:", msg);
     return {
       title: "Error",
       description: msg ?? "There was an error executing your request",
@@ -158,7 +159,7 @@ export class Bot extends REST {
     await this.patch(
       Routes.webhookMessage(this.applicationId, interaction.token, "@original"),
       {
-        body: data,
+        body: JSON.stringify(data),
       }
     );
   }
