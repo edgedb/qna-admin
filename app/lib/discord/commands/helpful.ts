@@ -95,6 +95,7 @@ export default class HelpfulCommand
           flags: MessageFlags.Ephemeral,
         },
       });
+      return;
     }
 
     respond(bot.defer());
