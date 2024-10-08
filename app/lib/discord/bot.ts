@@ -158,7 +158,7 @@ export class Bot extends REST {
     await this.patch(
       Routes.webhookMessage(this.applicationId, interaction.token, "@original"),
       {
-        body: JSON.stringify(data),
+        body: data,
       }
     );
   }
