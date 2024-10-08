@@ -126,7 +126,6 @@ export class Bot extends REST {
   }
 
   errorEmbed(msg?: string): APIEmbed {
-    console.log("Error:", msg);
     return {
       title: "Error",
       description: msg ?? "There was an error executing your request",
@@ -134,7 +133,7 @@ export class Bot extends REST {
     };
   }
 
-  defer(ephemeral: boolean = true): APIInteractionResponse {
+  defer(ephemeral = true): APIInteractionResponse {
     return {
       type: InteractionResponseType.DeferredChannelMessageWithSource,
       data: {

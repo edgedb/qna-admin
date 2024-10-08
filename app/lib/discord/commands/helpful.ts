@@ -88,7 +88,8 @@ export default class HelpfulCommand
         data: {
           embeds: [
             bot.errorEmbed(
-              `${threadChannel.parent_id}, ${bot["help-channels"].size}, ${ids}}`
+              "Thread is not inside a valid help channel."
+              // `${threadChannel.parent_id}, ${bot["help-channels"].size}, ${ids}}`
             ),
           ],
           flags: MessageFlags.Ephemeral,
